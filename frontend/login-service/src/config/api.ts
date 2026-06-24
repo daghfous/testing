@@ -1,8 +1,9 @@
 import axios, { AxiosHeaders, AxiosInstance, CreateAxiosDefaults } from 'axios'
 
 import tokenService from '../services/TokenService'
+import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'
 
-const userRootPath: string = process.env.USER_MANAGEMENT_URL || 'users/'
+const userRootPath: string = getEnv('USER_MANAGEMENT_URL') || 'users/'
 
 // base config for axios clients
 const clientConfig = {

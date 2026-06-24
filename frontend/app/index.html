@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
   <head>
-    <base href=/ >
     <meta charset="utf-8" />
     <meta
       http-equiv="X-UA-Compatible"
@@ -12,10 +11,23 @@
     <link
       rel="icon"
       href="static-um/svg/AtemeIcon.svg" />
+    <script type="text/javascript">document.write(`<base href='${document.location.pathname}' />`);</script>
   </head>
   <body>
     <div id="app"></div>
     <div class="appLogin"></div>
+    <script>
+      // Load environment configuration dynamically
+      window.__envConfig = {};
+      fetch('/env/env.json')
+        .then(response => response.json())
+        .then(config => {
+          window.__envConfig = config;
+        })
+        .catch(error => {
+          console.warn('Failed to load /env/env.json:', error);
+        });
+    </script>
     <script
       type="module"
       src="/src/main.ts"></script>

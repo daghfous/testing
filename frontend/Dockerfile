@@ -49,16 +49,12 @@ LABEL maintainer="PILOT"
 # Copy nginx configuration
 COPY default.conf /ateme/nginx/conf.d/default.conf
 COPY entrypoint.sh /home/entrypoint.sh
-# Copy json-stringify.py script into /usr/local/bin
-COPY json-stringify.py /usr/local/bin/json-stringify.py
-
 # Copy builded application files
 COPY --from=builder /workspace/app/dist /ateme/nginx/html/
 COPY --from=builder /workspace/user-profile/dist /ateme/nginx/html/user-profile
 
-RUN mkdir /ateme/nginx/html-copy
-# Copy html configuration
-RUN cp -r /ateme/nginx/html/* /ateme/nginx/html-copy/
+# Create directory for config files
+RUN mkdir -p /ateme/nginx/html-copy /etc/config
 # Create temp directories needed by nginx
 RUN mkdir /tmp/client_body_temp /tmp/proxy_temp /tmp/fastcgi_temp /tmp/uwsgi_temp /tmp/scgi_temp
 

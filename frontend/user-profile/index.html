@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <base href=/ />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User management component</title>
+    <script type="text/javascript">document.write(`<base href='${document.location.pathname}' />`);</script>
+    <script>
+      // Load environment configuration dynamically
+      window.__envConfig = {};
+      fetch('/env/env.json')
+        .then(response => response.json())
+        .then(config => {
+          window.__envConfig = config;
+        })
+        .catch(error => {
+          console.warn('Failed to load /env/env.json:', error);
+        });
+    </script>
     <script type="module" src="./src/main.ts"></script>
   </head>
   <body>

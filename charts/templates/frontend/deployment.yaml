@@ -57,6 +57,9 @@ spec:
           emptyDir: {}
         - name: pid
           emptyDir: {}
+        - name: env-config
+          configMap:
+            name: {{ template "um.frontend.fullname" . }}
       {{- if .Values.frontend.podSecurityContext.enabled }}
       securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.frontend.podSecurityContext "context" $) | nindent 8 }}
       {{- end }}
@@ -104,6 +107,9 @@ spec:
               mountPath: /ateme/nginx/html
             - name: pid
               mountPath: /ateme/nginx/pid
+            - name: env-config
+              mountPath: /var/www/html/env/env.json
+              subPath: env.json
           env:
             - name: "USER_MGT_URL"
               value: "/{{ .Release.Name }}/users/"

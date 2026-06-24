@@ -7,6 +7,7 @@ import TokenService from '@ateme/login-service/src/services/TokenService'
 import ActivityService from '@ateme/login-service/src/services/ActivityService'
 import CurrentUserService from '@ateme/login-service/src/services/CurrentUserService'
 import AuthService from '@ateme/login-service/src/auth/auth'
+import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'
 import langMessagesNext from '../lang/index'
 import { IUserProfileElement } from '../interfaces/userProfile'
 import {
@@ -23,7 +24,7 @@ export class UserProfileService {
   private client: ApiClientService
   private refreshIntervalId?: number
   private readonly INACTIVE_USER_TIME_THRESHOLD = -1 // infinite timeout
-  private baseUrl = process.env.BASE_URL?.replace(/\/+$/, '')
+  private baseUrl = getEnv('BASE_URL')?.replace(/\/+$/, '')
 
   constructor() {
     // Initialize the API client
@@ -39,7 +40,7 @@ export class UserProfileService {
 
     // Register API client for user service
     this.client.registerApiClient('userClient', {
-      baseUrl: process.env.USER_MANAGEMENT_URL,
+      baseUrl: getEnv('USER_MANAGEMENT_URL'),
       responseInterceptor: TokenService.handleResponseInterceptor
     })
   }
@@ -78,7 +79,7 @@ export class UserProfileService {
       return false
     }
     const inactiveUserAction = () => {
-      AuthService.logout(process.env.BASE_URL)
+      AuthService.logout(getEnv('BASE_URL')?.replace(/^\/+/, ''))
     }
     let inactivityTimeout = this.INACTIVE_USER_TIME_THRESHOLD
     try {
@@ -125,7 +126,7 @@ export class UserProfileService {
     userProfileElement.userConfig = {
       userName: CurrentUserService.getUsername() || '',
       onEditProfile: () => location.assign(userProfileUrl),
-      onLogout: () => AuthService.logout(this.baseUrl?.replace(/^\/+/, ''))
+      onLogout: () => AuthService.logout(getEnv('BASE_URL')?.replace(/^\/+/, ''))
     }
     userProfileElement.appendTo = userProfileElement?.shadowRoot as Element
     if (url.includes(userProfileUrl)) {

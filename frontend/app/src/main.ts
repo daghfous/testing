@@ -8,7 +8,7 @@ import { getSingletonBuilder } from '@ateme/login-service/src/services/abilities
 import { initializeApiClient } from './api'
 import langMessages from './lang/index'
 import router from './router/index'
-import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'
+import { getEnv } from './utils/envConfig'
 import { defaultRedirectPath } from '@ateme/login-service/src/auth/loginInstance'
 import Logger from '@ateme/cathodic-ui/src/services/Logger.ts'
 

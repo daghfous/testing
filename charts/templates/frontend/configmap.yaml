@@ -42,5 +42,27 @@ data:
           return 200 'ready';
       }
       
+      # Serve env.json for frontend dynamic configuration
+      location = /env/env.json {
+        alias /var/www/html/env/env.json;
+        add_header Content-Type application/json;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires 0;
+      }
+    
     }
+  env.json: |
+{{- if .Values.frontend.envConfig }}
+{{ toYaml .Values.frontend.envConfig | indent 4 }}
+{{- else }}
+    {
+      "BASE_URL": "/{{ .Release.Name }}/",
+      "USER_MANAGEMENT_URL": "/{{ .Release.Name }}/users/",
+      "RELEASE_NAME": "{{ .Release.Name }}",
+      "DEPLOYING_WITH_PMF": {{ .Values.global.system.application.deployingWithPfs }},
+      "APP_VERSION": "{{ .Chart.Version }}",
+      "APP_ID": "{{ .Chart.Name }}"
+    }
+{{- end }}
 {{- end }}

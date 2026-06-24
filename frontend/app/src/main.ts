@@ -8,7 +8,8 @@ import { getSingletonBuilder } from '@ateme/login-service/src/services/abilities
 import { initializeApiClient } from './api'
 import langMessages from './lang/index'
 import router from './router/index'
-import { getEnv } from './utils/envConfig'
+import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'
+import EnvService from '@ateme/cathodic-ui/src/services/EnvService'
 import { defaultRedirectPath } from '@ateme/login-service/src/auth/loginInstance'
 import Logger from '@ateme/cathodic-ui/src/services/Logger.ts'
 
@@ -164,6 +165,20 @@ const projectInitialize = () =>
       location.reload()
     }
   })
+
+/**
+ * Initialize environment configuration from ConfigMap
+ * Must be called before any getEnv() calls
+ */
+EnvService.getInstance().initConfigMap().then((success) => {
+  if (success) {
+    Logger.debug('main.ts', 'Environment configuration loaded from ConfigMap successfully')
+  } else {
+    Logger.warn('main.ts', 'Failed to load environment configuration from ConfigMap, falling back to defaults')
+  }
+}).catch((error) => {
+  Logger.error('main.ts', `Error loading environment configuration: ${error}`)
+})
 
 /**
  * Starts the login initialization process with specified configurations.

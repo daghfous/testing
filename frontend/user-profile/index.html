@@ -4,7 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User management component</title>
-    <script type="text/javascript">document.write(`<base href='${document.location.pathname}' />`);</script>
+    <script>
+      // Dynamically set base href from document.location.pathname
+      (function() {
+        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+        const basePath = pathSegments.length > 0 ? '/' + pathSegments[0] : '';
+        const baseElement = document.createElement('base');
+        baseElement.href = basePath + '/';
+        document.head.insertBefore(baseElement, document.head.firstChild);
+      })();
+    </script>
     <script>
       // Load environment configuration dynamically
       window.__envConfig = {};

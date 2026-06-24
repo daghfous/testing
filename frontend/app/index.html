@@ -11,7 +11,16 @@
     <link
       rel="icon"
       href="static-um/svg/AtemeIcon.svg" />
-    <script type="text/javascript">document.write(`<base href='${document.location.pathname}' />`);</script>
+    <script>
+      // Dynamically set base href from document.location.pathname
+      (function() {
+        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+        const basePath = pathSegments.length > 0 ? '/' + pathSegments[0] : '';
+        const baseElement = document.createElement('base');
+        baseElement.href = basePath + '/';
+        document.head.insertBefore(baseElement, document.head.firstChild);
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

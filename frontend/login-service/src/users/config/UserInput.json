@@ -1,0 +1,38 @@
+{
+  "title": "UserInput",
+  "type": "object",
+  "input": "true",
+  "required": ["password", "username"],
+  "properties": {
+    "username": {
+      "description": "Username from 3 to 255 characters long, using:\n- lower/uppercase letters and numbers\n- no special character\n- no space",
+      "title": "Username",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{3,255}$"
+    },
+    "password": {
+      "description": "Password from 8 to 255 characters long, using:\n - at least one lower case letter,\n - one upper case letter,\n - one digit,\n - at least one special character (#$^+=!*()@%&),\n- no space",
+      "title": "Password",
+      "type": "string",
+      "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$^+=!*()@%&])\\S{8,255}$"
+    },
+    "role": {
+      "title": "The user's role",
+      "type": "string"
+    },
+    "password_policy": {
+      "title": "Password policy",
+      "type": "object",
+      "properties": {
+        "password_min_length": {
+          "title": "Password min length",
+          "type": "number"
+        },
+        "pattern": {
+          "title": "Regex pattern",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

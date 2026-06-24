@@ -1,0 +1,16 @@
+{
+  "title": "Migration schema for collection idp_config of User Management for version 5.0",
+  "component": "user-management",
+  "collection": "idp_config",
+  "version": "5.0",
+  "import_policy": {
+    "conflict_management": "override",
+    "key_index": [
+      {"idp_name": "ASCENDING"}
+    ]
+   },
+  "export_policy": {
+    "filters": {},
+    "fields": {"_id": 0}
+  }
+}

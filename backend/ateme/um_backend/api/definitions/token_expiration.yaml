@@ -1,0 +1,6 @@
+title: token expiration
+description: "Expiration period (in seconds) for the token auth"
+type: integer
+default: 3600
+minimum: 5
+example: 3600

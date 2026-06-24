@@ -1,0 +1,8 @@
+title: idp ldap config structure.
+description: This data structure describes the ldap_config format exposed by the API.
+allOf:
+  - $ref: './idp_ldap_config.yaml'
+example:
+  idp_type: ldap
+  idp_name: corp-ldap
+  idp_label: Corporate LDAP Updated

@@ -1,0 +1,22 @@
+type: object
+properties:
+  client_id:
+    type: string
+    description: Client identifier.
+    example: client_id
+  username:
+    type: string
+    description: Username of the client.
+    example: demo.user
+  attempts:
+    type: number
+    example: 1
+    description: Number of failed login attempts for the client.
+  enabled:
+    type: boolean
+    description: Indicates whether the client is enabled.
+    example: true
+  last_attempt_date:
+    type: number
+    description: Timestamp of the last login attempt for the client.
+    example: 1735219560

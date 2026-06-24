@@ -1,0 +1,18 @@
+{
+  "title": "Migration schema for collection ldap_config of User Management for version 4.0",
+  "component": "user-management",
+  "collection": "invalid_collection",
+  "version": "4.0",
+  "import_policy": {
+    "conflict_management": "abort",
+    "key_index": [
+      {"user_id": "ASCENDING"},
+      {"username": "ASCENDING"}
+    ]
+   },
+  "export_policy": {
+    "filters": {},
+    "fields": {}
+  }
+}
+

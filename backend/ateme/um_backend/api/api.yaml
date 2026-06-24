@@ -1,0 +1,2012 @@
+# To generate the API documentation as an HTML file, use Ateme openapi binary
+# python -m ateme.openapi release ateme/um_backend/api/api.yaml ateme/um_backend/api/api.html
+#
+# The HTML file will need a badge on the TopLeft of the page
+# You can generate the badge with those python commands:
+# import anybadge
+# badge = anybadge.Badge("Docs API", "User_Management", default_color='blue')
+# badge.write_badge("<project-base-path>/ateme/um_backend/api/User_Management.svg", overwrite=True)
+openapi: 3.0.0
+info:
+  title: User Management API
+  version: v2
+  description: |
+    The User Management API allows to manage users, scopes, roles, sessions,
+    tokens, and identity providers (LDAP/SAML) in PILOT Manager.
+ 
+    Features:
+    - Manage local users and their access scopes
+    - Connect external Identity Providers (LDAP, SAML)
+    - Manage user sessions and token lifecycle
+    - Backup and restore full configuration
+    - API and authorization data discovery
+ 
+    Authentication:
+    This API is token-based. A valid token must be included in request headers.
+    Tokens are obtained via `POST /token` and can be refreshed via `POST /refresh_token`.
+ 
+    Scopes:
+    Endpoints are protected by role-based scopes:
+    - **administrator**: Full access to all users, roles, and identity management.
+    - **engineer**: Configuration-related actions with additional permissions on users, roles, and identity management.
+    - **guest**: Minimal access — view personal information, logout, and change password.
+  
+  contact:
+    name: Ateme Support
+    url: https://www.ateme.com/support-services/
+  license:
+    name: All rights reserved - Ateme 1992-2026
+  x-logo:
+    # The name defined here should be the same as the name defined in the $API_NAME env variable
+    # in the .build-publish-yaml-doc ci job
+    url: "User_Management.svg"
+    altText: "User Management Badge"
+  x-auth:
+    prefix: usr
+    label: Users
+    scope_descriptions:
+      administrator: Role granting full access to all users, roles, and identity management functionalities.
+      engineer: Role allowing configuration-related actions with additional permissions on users, roles, and identity management functionalities.
+      guest: Role with minimal access, limited to viewing personal information, logging out, and changing the password.
+      internal: Internal Role for users
+      internal_administrator: Internal administrator role for system-level management operations.
+
+servers:
+  - url: https://{host}/{release_name}/users
+    description: User Management API endpoint
+    variables:
+      host:
+        default: users.example.com
+        description: Hostname or IP of the User Management API ingress
+      release_name:
+        default: user-management
+        description: Helm release name used during deployment
+
+tags:
+  - name: Documentation
+    description: Endpoints to retrieve openAPI specification and API documentation
+    x-internal: true
+  - name: Ping
+    description: Health check endpoints to verify the API is running.
+    x-internal: true
+  - name: Readiness
+    description: Readiness probe to check whether the service is fully operational.
+    x-internal: true
+  - name: Admin
+    description: Super administrator setup and management (single admin user allowed at installation).
+  - name: Token Introspection
+    description: |
+      Token introspection endpoint for validating access tokens and retrieving authorization context.
+      Used by ingress and internal components for access control decisions.
+    x-internal: true
+  - name: Token
+    description: |
+      Authentication token operations: login, logout, refresh.
+  - name: Current User
+    description: Operations available to the currently authenticated user (profile, password, preferences, actions).
+  - name: Users
+    description: User management — create, view, update, and delete registered users.
+  - name: Scopes
+    description: Scope management — define and manage role-based access scopes assigned to users.
+  - name: Actions
+    description: View the list of available actions derived from registered API definitions.
+  - name: Idp Configuration
+    description: Identity Provider configuration — manage LDAP and SAML integrations.
+  - name: Idp
+    description: Identity Provider runtime — SSO redirects, SAML callbacks, and SP metadata generation.
+  - name: Authenticate Mode
+    description: Available authentication modes (IDP configurations) for the login page.
+  - name: Configuration
+    description: User management service configuration (password policies, session settings, token expiration management, etc.).
+  - name: Sessions
+    description: Session management — list active sessions and revoke them.
+  - name: Import / Export
+    description: Backup and restore of the complete user management configuration.
+  - name: Internal
+    description: Internal system endpoints used by other microservices. Not intended for direct use by end users.
+    x-internal: true
+  - name: Data Synchronisation
+    description: Endpoints for synchronising user management data during failover or replication scenarios.
+    x-internal: true
+
+paths:
+  /definition:
+    $ref: '#__auto_definition?x-internal=true'
+  /documentation:
+    $ref: '#__auto_doc?x-internal=true'
+
+  /ping:
+    get:
+      operationId: get_ping
+      summary: Ping
+      description: Simple liveness check. Returns 200 if the User Management service is up and reachable.
+      x-internal: true
+      tags:
+        - Ping
+      responses:
+        '200':
+          description: OK - Service is up
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "OK"
+  /readiness:
+    get:
+      operationId: get_readiness
+      summary: Check readiness
+      description: |
+        Readiness probe. Returns 200 when the service is fully operational (database connected, all dependencies healthy).
+        Returns 503 if the service is not ready to handle requests, which can be used by orchestration tools to delay traffic until the service is ready.
+      x-internal: true
+      tags:
+        - Readiness
+      responses:
+        '200':
+          description: OK - Service is fully functional
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "OK"
+        '503':
+          description: Database not Available - Service is not ready
+  /admin:
+    get:
+      operationId: get_admin
+      summary: View admin
+      description: Allow to get administrator user information
+      tags:
+        - Admin
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - Admin user exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    description: Admin username
+                    example: "admin"
+        '404':
+          description: Not Found - Admin user not found
+    post:
+      operationId: create_admin_user
+      summary: Create the Super Admin
+      description: |
+        Create the initial super administrator account.
+        Only one admin can be created during installation.
+      tags:
+        - Admin
+      x-scopes: ["administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/admin.yaml'
+      responses:
+        '201':
+          description: OK - Admin user created
+        '400':
+          description: Bad Request - Password doesn't match the constraints
+        '403':
+          description: Forbidden, an admin user has already been created
+
+  /api_definition:
+    post:
+      operationId: post_api_definition
+      summary: Register API definition
+      description: |
+        Register an OpenAPI-based API definition used to compute scopes and actions.
+        This endpoint is internal and intended for service-to-service usage.
+      tags:
+        - Internal
+      x-scopes: ["internal_administrator", "internal"]
+      x-internal: true
+      parameters:
+        - in: query
+          name: disable_validation
+          description: If set to `true`, validation of the API definition is disabled. Useful to avoid timeouts with large OpenAPI definitions.
+          required: false
+          schema:
+              type: boolean
+              default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: definitions/api_definition.yaml
+      responses:
+        '201':
+          description: OK - API definition registered
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '500':
+            description: Internal Server Error
+    delete:
+      operationId: delete_api_definition
+      summary: Delete API definition
+      description: |
+        Delete a previously registered API definition with its computed scopes,
+        actions, and API descriptor metadata.
+        Provide either a product payload (`prefix` + optional `app_name`) or
+        a controller payload (`api_url`).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: 'definitions/delete_api_product.yaml'
+                - $ref: 'definitions/delete_api_controller.yaml'
+      tags:
+        - Internal
+      x-internal: true
+      x-scopes: ["internal_administrator", "internal"]
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /user/me:
+    get:
+      operationId: get_current_user
+      summary: View current user
+      description: Return the authenticated user's profile.
+      tags:
+        - Current User
+      x-scopes: ["administrator", "engineer", "guest", "internal"]
+      responses:
+        '200':
+          description: OK - User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/user.yaml'
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+  /user/me/actions:
+    get:
+      operationId: get_current_user_actions
+      summary: View current actions
+      description: Return the list of actions granted to the authenticated user.
+      tags:
+        - Current User
+      x-scopes: ["administrator", "engineer", "guest", "internal"]
+      responses:
+        '200':
+          description: OK - User actions retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/scope_content.yaml'
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+  /user/me/preferences:
+    patch:
+      operationId: update_user_preferences
+      summary: Edit user preferences
+      description: |
+        Update one or more preferences for the authenticated user.
+        Key/value pairs are service-defined.
+      tags:
+        - Current User
+      x-scopes: ["administrator", "engineer", "guest", "internal"]
+      requestBody:
+        description: The preference key/value
+        content:
+          application/json:
+            schema:
+              type: object
+              title: Preference to update for the user
+            examples:
+              language_preference:
+                summary: Update language preference
+                value:
+                  language: en
+      responses:
+        '200':
+          description: OK - User preferences updated
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+  /user/me/password:
+    patch:
+      operationId: change_password
+      summary: Change password
+      description: Change password for the authenticated user.
+      tags:
+        - Current User
+      x-scopes: [ "administrator", "engineer", "guest", "internal" ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - old_password
+                - new_password
+              properties:
+                old_password:
+                  type: string
+                  title: User old password
+                new_password:
+                  type: string
+                  title: User new password
+            examples:
+              password_rotation:
+                summary: Change current password
+                value:
+                  old_password: "<OLD_PASSWORD>"
+                  new_password: "<NEW_PASSWORD>"
+      responses:
+        '200':
+          description: OK - Password changed
+          content:
+            application/json:
+              schema:
+                title: Result
+                type: object
+                properties:
+                  body:
+                    type: string
+        '400':
+          description: |
+            Bad Request - Content validation failed, incorrect password,
+            new password does not match constraints or is identical to previous one
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found - User not found
+  /user/me/session_timeout:
+    patch:
+      operationId: change_session_timeout
+      summary: Change session timeout
+      description: Enable or disable session timeout for the authenticated user.
+      tags:
+        - Current User
+      x-scopes: [ "administrator" ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - disabled
+              properties:
+                disabled:
+                  type: boolean
+                  title: session timeout value
+            examples:
+              disable_timeout:
+                summary: Disable timeout for this user
+                value:
+                  disabled: true
+      responses:
+        '200':
+          description: OK - Session timeout changed
+          content:
+            application/json:
+              schema:
+                title: Result
+                type: object
+                properties:
+                  body:
+                    type: string
+        '400':
+          description: Bad Request - Invalid configuration
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /public/configuration:
+    get:
+      operationId: get_public_configuration
+      summary: View public configuration
+      description: |
+        Return non-sensitive configuration required before authentication.
+        This is a public configuration and sensitive values are intentionally excluded.
+      tags:
+        - Configuration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/public_configuration.yaml'
+      responses:
+        '200':
+          description: OK - Public configuration retrieved
+
+  /configuration:
+    put:
+      operationId: update_configuration
+      summary: Edit configuration
+      description: |
+        Update the user management runtime configuration.
+        Use `force_change_password=true` to require all local users to reset their password on next login.
+      x-scopes: ["administrator"]
+      parameters:
+        - name: "force_change_password"
+          in: "query"
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: true
+          description: This query param will force all local users to change their passwords
+      tags:
+        - Configuration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/configuration.yaml'
+      responses:
+        '200':
+          description: OK - Configuration updated
+        '400':
+          description: Bad Request - Invalid configuration
+    get:
+      operationId: get_configuration
+      summary: View configuration
+      description: Allow to view user management configuration
+      x-scopes: ["administrator"]
+      tags:
+        - Configuration
+      responses:
+        '200':
+          description: OK - Configuration retrieved
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/configuration.yaml'
+
+  /idpconfigs:
+    post:
+      operationId: store_idp_config
+      summary: Add Identity Provider configuration
+      description: |
+        Create a new Identity Provider configuration.
+        Use `idp_type: ldap` or `idp_type: saml` to select the provider type.
+      tags:
+        - Idp Configuration
+      x-scopes: ["administrator"]
+      requestBody:
+        description: The parameters to create idp configuration
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: 'definitions/idp_ldap_config_post.yaml'
+                - $ref: 'definitions/idp_saml_config_post.yaml'
+              discriminator:
+                propertyName: idp_type
+                mapping:
+                  saml: 'definitions/idp_saml_config_post.yaml'
+                  ldap: 'definitions/idp_ldap_config_post.yaml'
+      responses:
+        '201':
+          description: OK - Created
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - Invalid configuration format
+        '409':
+          description: Conflict — an Identity Provider configuration with this idp_name already exists
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Identity Provider configuration with idp_name 'example_idp' already exists"
+        '500':
+          description: Internal Server Error - Failed to create Identity Provider configuration
+          content:
+            text/plain:
+              schema:
+                type: string
+    get:
+      operationId: get_idp_configs
+      summary: List Identity Provider configurations
+      description: |
+        List configured Identity Providers.
+        Secret values may be hidden depending on provider type.
+      tags:
+        - Idp Configuration
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - Identity Provider configurations retrieved
+          content:
+            application/json:
+              schema:
+                title: Idp Config array
+                type: array
+                items:
+                  oneOf:
+                    - $ref: 'definitions/idp_ldap_config.yaml'
+                    - $ref: 'definitions/idp_local_config.yaml'
+                    - $ref: 'definitions/idp_saml_config.yaml'
+  /idpconfigs/validate:
+    post:
+      operationId: validate_idp_config
+      summary: Validate Identity Provider configuration
+      description: Validate an LDAP or SAML configuration without persisting it.
+      tags:
+        - Idp Configuration
+      x-scopes: ["administrator"]
+      requestBody:
+        description: Idp config to validate
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: 'definitions/idp_saml_config_post.yaml'
+                - $ref: 'definitions/idp_ldap_config_validate.yaml'
+              discriminator:
+                propertyName: idp_type
+                mapping:
+                  saml: 'definitions/idp_saml_config_post.yaml'
+                  ldap: 'definitions/idp_ldap_config_validate.yaml'
+      responses:
+        '200':
+          description: OK - Valid IDP configuration
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - Invalid configuration format
+        '406':
+          description: Not Acceptable — invalid IDP configuration
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error - Failed to validate Identity Provider configuration
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /idpconfigs/{idp_name}:
+    parameters:
+      - name: "idp_name"
+        in: "path"
+        description: "idp config resource unique id"
+        required: true
+        schema:
+          $ref: 'definitions/idp_unique_name.yaml'
+    get:
+      operationId: get_idp_config_by_name
+      summary: View Identity Provider configuration
+      description: Retrieve an Identity Provider configuration by idp_name.
+      tags:
+        - Idp Configuration
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - Identity Provider configuration retrieved
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: 'definitions/idp_ldap_config.yaml'
+                  - $ref: 'definitions/idp_saml_config.yaml'
+        '404':
+          description: Not Found - Identity Provider configuration not found
+          content:
+            text/plain:
+              schema:
+                type: string
+    patch:
+      operationId: update_idp_config
+      summary: Update Identity Provider configuration
+      description: |
+        Update an existing Identity Provider configuration.
+        Use update_users_scopes=true to recompute users attached scopes.
+      parameters:
+        - name: "update_users_scopes"
+          in: "query"
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: true
+          description: This query param will update users scopes attached to this idp config
+      tags:
+        - Idp Configuration
+      x-scopes: ["administrator"]
+      requestBody:
+        description: The parameters to update idp configuration
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: 'definitions/idp_ldap_config.yaml'
+                - $ref: 'definitions/idp_saml_config.yaml'
+              discriminator:
+                propertyName: idp_type
+                mapping:
+                  saml: 'definitions/idp_saml_config.yaml'
+                  ldap: 'definitions/idp_ldap_config.yaml'
+      responses:
+        '200':
+          description: OK - Identity Provider configuration updated
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - Invalid configuration format
+        '500':
+          description: Internal Server Error - Identity Provider configuration update failed
+          content:
+            text/plain:
+              schema:
+                type: string
+    delete:
+      operationId: remove_idp_config
+      summary: Delete Identity Provider configuration
+      description: |
+        Delete an Identity Provider configuration by idp_name.
+        Existing users are not deleted, but authentication through this IDP
+        will no longer be possible after removal.
+      tags:
+        - Idp Configuration
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - Identity Provider configuration removed
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Not Found - Identity Provider configuration not found
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error - Identity Provider configuration removal failed
+          content:
+            text/plain:
+              schema:
+                type: string
+  /idp_metadata/{idp_name}:
+    parameters:
+      - in: path
+        name: idp_name
+        description: Idp name
+        required: true
+        schema:
+          $ref: 'definitions/idp_unique_name.yaml'
+    get:
+      operationId: get_sp_metadata
+      summary: Get Service Provider metadata
+      description: |
+        Generate Service Provider metadata associated with the target idp_name.
+        Optionally propagates relay_state for post-authentication redirection.
+      tags:
+        - Idp
+      parameters:
+        - in: query
+          name: relay_state
+          description: Relay state url
+          required: false
+          schema:
+            type: string
+            example: /dashboard
+      responses:
+        '200':
+          description: OK - Identity Provider metadata returned
+          content:
+            text/xml:
+              schema:
+                type: string
+        '400':
+          description: Invalid IDP metadata
+  /logout:
+    delete:
+      operationId: logout
+      summary: Log out
+      description: Invalidate the current token and close the authenticated session.
+      tags:
+        - Token
+      x-scopes: ["administrator", "engineer", "guest", "internal"]
+      parameters:
+        - in: query
+          name: relay_state
+          description: Relay state url
+          schema:
+            type: string
+            example: /login
+      responses:
+        '200':
+          description: OK - Token deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  body:
+                    type: string
+                    title: Result of logout
+        '400':
+          description: No token or invalid token in request headers
+        '500':
+          description: Internal Server Error - Token deletion failed
+  /password:
+    patch:
+      deprecated: true
+      operationId: deprecated_change_password
+      summary: Change password
+      description: |
+        Deprecated endpoint for changing password.
+        Use PATCH /user/me/password instead.
+      tags:
+        - Current User
+      x-scopes: ["administrator", "engineer", "guest", "internal"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - old_password
+                - new_password
+              properties:
+                username:
+                  type: string
+                  title: User name
+                  description: |
+                    UNUSED - This field was used to identify the user to be modified.
+                    Now retrieved from the token.
+                idp_name:
+                  type: string
+                  title: Identity Provider name
+                  description: |
+                    UNUSED - This field was used to identify the user to be modified.
+                    Now retrieved from the token.
+                old_password:
+                  type: string
+                  title: User old password
+                new_password:
+                  type: string
+                  title: User new password
+            examples:
+              deprecated_payload:
+                summary: Legacy payload format
+                value:
+                  username: demo.user
+                  idp_name: local
+                  old_password: "<OLD_PASSWORD>"
+                  new_password: "<NEW_PASSWORD>"
+      responses:
+        '410':
+          description: Deprecated — use PATCH /user/me/password instead
+
+  /v2/scopes:
+    get:
+      operationId: get_scopes
+      summary: View scopes
+      description: |
+        Retrieve a list of scopes.
+
+        Example filter usage:
+        `GET /v2/scopes?mode=rw&type=engineer&label=monitor&default=false&sort=id&range=0-49`
+      tags:
+        - Scopes
+      parameters:
+        - name: sort
+          in: query
+          description: Sort by id, prefix with `-` for descending
+          schema:
+            type: string
+            enum:
+              - -id
+              - id
+            default: id
+            example: id
+        - in: query
+          name: mode
+          description: Filter by scope mode
+          schema:
+            $ref: 'definitions/scope_mode.yaml'
+            example: rw
+        - name: app_name
+          in: query
+          description: Filter by application release name
+          required: false
+          schema:
+            type: string
+            example: pilot-manager
+        - name: type
+          in: query
+          description: Filter by type of scope
+          required: false
+          schema:
+            type: string
+            enum:
+              - administrator
+              - engineer
+              - operator
+              - monitoring
+              - guest
+            example: engineer
+        - name: label
+          in: query
+          description: Filter by scope label containing the given text
+          required: false
+          schema:
+            type: string
+            example: sm_non_default_
+        - name: default
+          in: query
+          description: Filter by default flag
+          required: false
+          schema:
+            type: boolean
+            example: false
+        - name: range
+          in: query
+          description: |
+            Specifies the range (zero-indexed & inclusive) of items to return from the full list of scopes
+            The range of results shall be in the format `start-end` (e.g., `0-49`)
+          required: false
+          schema:
+            type: string
+            pattern: "^\\d+-\\d+$"
+            example: "0-49"
+      x-scopes: ["administrator", "engineer", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - List retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/scope.yaml'
+        '206':
+          description: Partial content response when only a subset of the full data is returned.
+          headers:
+            Content-Range:
+              description: Specifies the range of items returned and the total count
+              schema:
+                type: string
+                example: scopes 0-49/500
+            Accept-Ranges:
+              description: Indicates support for range-based pagination
+              schema:
+                type: string
+                example: scopes 100
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/scope.yaml'
+        '400':
+          description: |
+            BadRequest, when:
+            - `mode` query param is inaccurate.
+        '416':
+          description: Requested range not satisfiable. None of the requested items can be returned.
+          headers:
+            Content-Range:
+              description: Specifies the total count of items
+              schema:
+                type: string
+                example: scopes */500
+            Accept-Ranges:
+              description: Indicates support for range-based pagination
+              schema:
+                type: string
+                example: scopes 100
+    post:
+      operationId: store_scope
+      summary: Add scope
+      description: |
+        Create a new scope definition.
+        Required fields: `id`, `label`, `description`, and `content` (array of action/policy entries).
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: 'definitions/scope.yaml'
+                - type: object
+                  # id is readonly but required for creation, description is only required for creation by api
+                  required: ["id", "description"]
+      responses:
+        '201':
+          description: OK - Created
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - Invalid scope format or missing required fields
+        '409':
+          description: Conflict — a scope with this id already exists
+
+  /scopes:
+    get:
+      operationId: get_scopes_deprecated
+      summary: View scopes
+      description: |
+        DEPRECATED in favor of GET /v2/scopes
+        Allow to view the list of scopes.
+      deprecated: true
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "engineer", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - List retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/scope.yaml'
+    post:
+      deprecated: true
+      operationId: store_scopes
+      summary: Add scope(s)
+      description: |
+        DEPRECATED in favor of POST /v2/scopes
+        Allow to create new scopes
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                allOf:
+                  - $ref: 'definitions/scope.yaml'
+                  - type: object
+                    # id is readonly but required for creation, description is only required for creation by api
+                    required: ["id", "description"]
+            examples:
+              bulk_create_scopes:
+                summary: Legacy bulk scope creation
+                value:
+                  - id: usr.custom_monitoring
+                    label: Custom Monitoring
+                    description: Custom monitoring permissions
+                    content:
+                      - action: usr:read_users
+                        policy: allow
+      responses:
+        '200':
+          description: OK - Scopes added
+          content:
+            application/json:
+              schema:
+                title: Result object
+                type: object
+                properties:
+                  body:
+                    type: string
+                    title: Result of request
+    delete:
+      deprecated: true
+      operationId: remove_scopes
+      summary: Delete scopes
+      description: |
+        DEPRECATED in favor of DELETE /scopes/{id}
+        Allow to delete a list of scopes
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+            examples:
+              bulk_delete_scopes:
+                summary: Legacy bulk scope deletion
+                value:
+                  - usr.custom_monitoring
+      responses:
+        '200':
+          description: OK - Scopes removed
+          content:
+            application/json:
+              schema:
+                type: object
+  /scopes/{id}:
+    parameters:
+      - name: "id"
+        in: "path"
+        description: "scope unique attribute"
+        required: true
+        schema:
+          type: string
+          example: usr.custom_engineer
+    get:
+      operationId: get_scope_by_id
+      summary: View scope
+      description: Retrieve one scope by identifier.
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - Scope configuration retrieved
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/scope.yaml'
+        '404':
+          description: Scope object not found
+          content:
+            text/plain:
+              schema:
+                type: string
+    patch:
+      operationId: update_scope_by_id
+      summary: Update scope
+      description: Update an existing scope by identifier.
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        description: The parameters to update Scope
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/scope.yaml'
+      responses:
+        '200':
+          description: OK - Scope updated
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - Invalid scope format
+        '404':
+          description: Scope object not found
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error - Scope update failed
+          content:
+            text/plain:
+              schema:
+                type: string
+    delete:
+      operationId: remove_scope_by_id
+      summary: Delete scope
+      description: |
+        Delete one scope by identifier.
+        If the scope is still assigned to users or referenced by another
+        scope, the operation may fail until those references are removed.
+      tags:
+        - Scopes
+      x-scopes: ["administrator", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - Scope removed
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found - Scope not found
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal Server Error - Scope removal failed
+          content:
+            text/plain:
+              schema:
+                type: string
+  /actions:
+    get:
+      operationId: get_actions
+      summary: List actions
+      description: List all actions derived from registered API definitions.
+      tags:
+        - Actions
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - List retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/action.yaml'
+  /token_introspection:
+    post:
+      operationId: token_introspection
+      summary: Introspect token
+      x-internal: true
+      description: |
+        Validate an access token and return authorization context.
+        Used by ingress and internal components for access control decisions.
+      tags:
+        - Token Introspection
+      parameters:
+      - name: X-Original-URI
+        in: header
+        schema:
+          type: string
+          example: /users/local/demo.user
+        description: Original request uri, forwarded by ingress-nginx.
+      - name: X-Original-Method
+        in: header
+        schema:
+          type: string
+          example: GET
+        description: Original request method, forwarded by ingress-nginx.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: 'definitions/token_introspection.yaml'
+      responses:
+        '200':
+          description: OK - Token authorized
+          headers:
+            X-User:
+              description: |
+                Username of the user who processes the request.
+              schema:
+                type: string
+            X-IDP-Name:
+              description: |
+                IDP name of the user who processes the request.
+                A username is unique by IDP.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  active:
+                    description: Bool field of token activation
+                    type: boolean
+                  sub:
+                    description: User ID
+                    type: string
+        '400':
+          description: |
+            BadRequest, when:
+            - `uri` or `method` cannot be extracted from the request (body or headers).
+        '401':
+          description: |
+            Unauthorized, when:
+            - the token cannot be extracted from the request.
+            - the token is not found in the database.
+            - the token is expired.
+            - the request remote IP does not match with the token user IP in database.
+        '403':
+          description: |
+            Forbidden, when:
+            - the user is not found in the database.
+            - the user is not allowed to make the request or action can't be found in database.
+  /token:
+    post:
+      operationId: login
+      summary: Authenticate user
+      description: |
+        Authenticate a user and return an access token on success.
+      tags:
+      - Token
+      requestBody:
+        description: Login payload
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/login.yaml'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/token.yaml'
+          description: OK - Token generated
+        '206':
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/token.yaml'
+          description: Partial Content - Token generated (first login or password expired)
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error - Login failed
+          content:
+            text/plain:
+              schema:
+                type: string
+        '503':
+          description: The number of maximum failed logins has been reached
+    delete:
+      operationId: force_user_disconnection
+      summary: Force user logout
+      description: Force logout of a selected user by revoking active tokens.
+      tags:
+        - Token
+      x-scopes: ["administrator", "engineer", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/user.yaml'
+      responses:
+        '200':
+          description: OK - User token deleted, user is disconnected
+        '400':
+          description: Bad Request
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error - Token removal failed
+          content:
+            text/plain:
+              schema:
+                type: string
+  /refresh_token:
+    post:
+      operationId: refresh_token
+      summary: Refresh token
+      description: |
+        Refresh an access token using a valid refresh token.
+      tags:
+        - Token
+      requestBody:
+        description: Post a refresh_token
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/refresh_token.yaml'
+      responses:
+        '200':
+          description: OK - Token Pair Returned (refresh token and a new access token)
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/token.yaml'
+        '400':
+          description: Bad Request
+  /tokenexp:
+    post:
+      operationId: change_token_expiration
+      summary: Set token expiration
+      description: Update access token expiration settings.
+      tags:
+      - Configuration
+      x-scopes: ["administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/token_expiration.yaml'
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: OK - Token expiration changed
+  /saml/callback/{idp_name}:
+    parameters:
+      - name: idp_name
+        in: path
+        description: Idp name
+        required: true
+        schema:
+          $ref: 'definitions/idp_unique_name.yaml'
+      - name: mode
+        in: query
+        description: |
+          DEPRECATED - Mode is automatically deduced from SAMLResponse content
+          Mode login or logout
+        required: false
+        schema:
+          type: string
+          deprecated: true
+          enum:
+            - login
+            - logout
+    get:
+      operationId: saml_callback_get
+      summary: SAML login/logout callback (GET)
+      description: SAML callback URL invoked by the Identity Provider after login or logout redirect.
+      tags:
+        - Idp
+      parameters:
+        - name: RelayState
+          in: query
+          description: Relay state where to redirect
+          schema:
+            type: string
+            example: /overview
+        - name: SAMLResponse
+          in: query
+          description: SAML Response
+          schema:
+            type: string
+            example: "<BASE64_SAML_RESPONSE>"
+      responses:
+        '302':
+          description: OK - Redirecting after SAML assertion
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      operationId: saml_callback_post
+      summary: SAML login/logout callback (POST)
+      description: SAML callback endpoint receiving form-encoded SAMLResponse payloads from the Identity Provider.
+      tags:
+        - Idp
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                name:
+                  type: array
+            examples:
+              saml_form_post:
+                summary: Typical Idp form POST payload
+                value:
+                  RelayState: /overview
+                  SAMLResponse: "<BASE64_SAML_RESPONSE>"
+      responses:
+        '302':
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/token.yaml'
+          description: OK - Token generated
+  /idp_sso/{idp_name}:
+    parameters:
+      - in: path
+        name: idp_name
+        description: Idp name
+        required: true
+        schema:
+          $ref: 'definitions/idp_unique_name.yaml'
+      - in: query
+        name: relay_state
+        description: Relay state url
+        schema:
+          type: string
+          example: /overview
+    get:
+      operationId: generate_sso
+      summary: Initiate SSO login
+      description: Generate a provider-specific SSO URL and redirect the client.
+      tags:
+        - Idp
+      responses:
+        '302':
+          description: OK - Redirecting to SSO URL
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /v2/users:
+    post:
+      operationId: add_user
+      summary: Add user
+      description: |
+        Create a new local user and assign one or more scopes.
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'definitions/user_local.yaml'
+      responses:
+        '201':
+          description: OK - Created
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '409':
+          description: Conflict — a user with this name already exists
+
+  /users:
+    get:
+      operationId: get_users
+      summary: List users
+      description: Retrieve the list of registered users.
+      tags:
+        - Users
+      x-scopes: ["administrator", "engineer", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - Users retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/user.yaml'
+    post:
+      deprecated: true
+      operationId: add_users
+      summary: Add user(s)
+      description: |
+        DEPRECATED in favor of POST /v2/users
+        Allow to add new users and set their scope
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'definitions/user_local.yaml'
+            examples:
+              bulk_local_users:
+                summary: Legacy bulk user creation
+                value:
+                  - username: user.one
+                    password: "<PASSWORD>"
+                    scopes: ["usr.engineer"]
+      responses:
+        '201':
+          description: OK - All users created
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/errors.yaml'
+    delete:
+      deprecated: true
+      operationId: delete_users
+      summary: Delete users
+      description: |
+        Deprecated endpoint to delete multiple users.
+        Use DELETE /users/{idp_name}/{username} for single-user deletion.
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: array
+                  items:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                        description: Username
+                      idp_name:
+                        type: string
+                        description: Idp name
+                - type: array
+                  deprecated: true
+                  items:
+                    type: string
+                    title: Username
+            examples:
+              by_identity:
+                summary: Delete users by idp_name and username
+                value:
+                  - username: user.one
+                    idp_name: local
+              legacy_usernames:
+                summary: Legacy username-only payload
+                value:
+                  - user.one
+      responses:
+        '200':
+          description: OK - Users deleted
+        '409':
+          description: Trying to delete admin user
+    patch:
+      deprecated: true
+      operationId: deprecated_update_users
+      summary: Edit users
+      description: |
+        Deprecated endpoint to update multiple users in one call.
+        Use PATCH /users/{idp_name}/{username}.
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'definitions/user.yaml'
+            examples:
+              bulk_update_users:
+                summary: Legacy bulk update payload
+                value:
+                  - username: user.one
+                    idp_name: local
+                    enabled: false
+      responses:
+        '410':
+          description: Deprecated — use PATCH /users/{idp_name}/{username} instead
+
+  /users/{idp_name}/{username}:
+    parameters:
+      - name: "idp_name"
+        in: "path"
+        description: "idp name unique attribute"
+        required: true
+        schema:
+          type: string
+          example: local
+      - name: "username"
+        in: "path"
+        description: "user unique attribute"
+        required: true
+        schema:
+          type: string
+          example: demo.user
+    get:
+      operationId: get_user_by_name
+      summary: View user
+      description: Retrieve details for one user identified by idp_name and username.
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - User configuration retrieved
+          content:
+            application/json:
+              schema:
+                $ref: 'definitions/user.yaml'
+        '404':
+          description: User object not found
+          content:
+            text/plain:
+              schema:
+                type: string
+    patch:
+      operationId: update_user_by_name
+      summary: Update user
+      description: |
+        Update properties for a specific user.
+        Updatable fields include `scopes`, `password`, `enabled`,
+        `first_login`, `session_timeout_disabled`, and
+        `password_expiration_disabled`.
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      requestBody:
+        description: The parameters to update User
+        content:
+          application/json:
+            schema:
+              type: object
+              title: User structure.
+              properties:
+                username:
+                  type: string
+                  deprecated: true
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                password:
+                  type: string
+                session_timeout_disabled:
+                  title: Disable Session Timeout
+                  description: Flag deciding whether or not to disable the session timeout
+                  type: boolean
+                first_login:
+                  title: First login
+                  description: Whether the user will be requested to change its password at next login
+                  type: boolean
+                enabled:
+                  title: Enabled
+                  description: Whether the user is enabled. A disabled user will not be able to log in.
+                  type: boolean
+                level:
+                  type: integer
+                password_expiration_disabled:
+                  title: Disable Password Expiration Flag
+                  description: Flag to disable password expiration for the user. This flag is applicable only to LOCAL users
+                  type: boolean
+            examples:
+              disable_user:
+                summary: Disable one user account
+                value:
+                  enabled: false
+      responses:
+        '200':
+          description: OK - User updated
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request - Password doesn't match the constraints
+        '404':
+          description: User not found
+        '500':
+          description: User update failed
+          content:
+            text/plain:
+              schema:
+                type: string
+    delete:
+      operationId: remove_user_by_name
+      summary: Delete user
+      description: Delete a user identified by idp_name and username.
+      tags:
+        - Users
+      x-scopes: ["administrator", "internal_administrator"]
+      responses:
+        '200':
+          description: OK - User removed
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '404':
+          description: User not found
+        '500':
+          description: User remove failed
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /users/{idp_name}/{username}/enabled:
+    parameters:
+      - name: "idp_name"
+        in: "path"
+        description: "idp name unique attribute"
+        required: true
+        schema:
+          type: string
+      - name: "username"
+        in: "path"
+        description: "user unique attribute"
+        required: true
+        schema:
+          type: string
+    put:
+      operationId: reactivate_user_by_name
+      summary: Enable user
+      description: Re-enable a previously disabled user account.
+      tags:
+        - Users
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - User enabled
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error - User enable failed
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /authenticate_mode:
+    get:
+      # Same response as GET /idpconfigs but without authentication requirement
+      operationId: get_authenticate_mode
+      summary: List authentication modes
+      description: |
+        Return available authentication modes for login screens.
+        Only non-sensitive IDP fields are included.
+      tags:
+        - Authenticate Mode
+      responses:
+        '200':
+          description: OK - Authentication modes retrieved
+          content:
+            application/json:
+              schema:
+                title: idp config array
+                type: array
+                items:
+                  oneOf:
+                    - $ref: 'definitions/idp_ldap_config.yaml'
+                    - $ref: 'definitions/idp_local_config.yaml'
+                    - $ref: 'definitions/idp_saml_config.yaml'
+                  discriminator:
+                    propertyName: idp_type
+                    mapping:
+                      saml: 'definitions/idp_saml_config.yaml'
+                      ldap: 'definitions/idp_ldap_config.yaml'
+                      local: 'definitions/idp_local_config.yaml'
+
+  /sync/data:
+    get:
+      operationId: get_sync_data
+      summary: Export sync data
+      description: |
+        Export sync data from the database for failover or replication workflows.
+        The archive format matches backup/restore for the latest supported version.
+      tags:
+        - Data Synchronisation
+      x-internal: true
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - Sync data ready for export
+          headers:
+            Content-Disposition:
+              description: |
+                The HTTP Content-Disposition header indicates whether content should be displayed inline
+                in the browser as a web page or part of a web page or downloaded as an attachment locally.
+              schema:
+                type: string
+                example: |
+                  attachment; filename="user_management_2025-12-10_18-11-03_13.6.2_.dev2+ge345bcb5.d20251124_unknown_release_pmf.zip"
+
+        '500':
+          description: Internal Server Error - Sync data export failed
+    put:
+      operationId: import_sync_data
+      summary: Import sync data
+      description: |
+        Import sync data from a backup-compatible ZIP archive.
+        The request body must be a multipart/form-data binary file upload.
+      tags:
+        - Data Synchronisation
+      x-scopes: ["administrator"]
+      requestBody:
+        description: Backup-compatible ZIP archive generated by export/sync APIs.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: OK - Sync data imported
+        '400':
+          description: Bad sync data
+        '500':
+          description: Internal Server Error - Sync data import failed
+
+  /fullconfiguration:
+    get:
+      operationId: export_full_configuration
+      summary: Export full configuration
+      description: Export a full configuration backup from the database.
+      tags:
+        - Import / Export
+      x-scopes: ["administrator"]
+      parameters:
+        - in: query
+          name: file_name
+          description: The destination file name to store the export result
+          schema:
+            title: File name used to store the exported configuration
+            description: |
+              The file name (with its path) with the exported configuration, without extension.
+              The .zip extension will be added at the end of the process.
+            type: string
+            example: "export_for_4.0"
+            minLength: 1
+            maxLength: 200
+        - in: query
+          name: include_admin_credentials
+          description: Include the admin credentials to the export result
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: false
+      responses:
+        '200':
+          description: OK - Full configuration exported
+        '400':
+            description: Invalid filename used to export the configuration
+        '500':
+          description: Internal Server Error - Full configuration export failed
+    put:
+      operationId: import_full_configuration
+      summary: Import full configuration
+      description: |
+        Import a full configuration backup into the database.
+        The request body must be a multipart/form-data binary ZIP upload.
+      tags:
+        - Import / Export
+      x-scopes: ["administrator"]
+      parameters:
+        - in: query
+          name: include_admin_credentials
+          description: Include the admin credentials to the import result
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: false
+        - in: query
+          name: force_override
+          description: Force the override flag to True for conflicts when importing the configuration
+          required: false
+          schema:
+            type: boolean
+            default: false
+            example: true
+      requestBody:
+        description: Full-configuration backup ZIP file.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: OK - Full configuration imported
+        '400':
+            description: Bad Request - Invalid full configuration
+        '500':
+          description: Internal Server Error - Full configuration import failed
+
+  /auth_data:
+    post:
+      operationId: post_auth_data
+      summary: Post authentication data
+      description: |
+        Internal endpoint to synchronise authentication metadata
+        (actions, scopes, and API descriptors).
+      x-internal: true
+      x-scopes: ["internal_administrator"]
+      tags:
+        - Internal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - content
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - ADDED
+                    - MODIFIED
+                    - DELETED
+                content:
+                  type: object
+                  properties:
+                    actions:
+                      type: array
+                      items:
+                        $ref: "definitions/action.yaml"
+                    scopes:
+                      type: array
+                      items:
+                        $ref: "definitions/scope.yaml"
+                    api_descriptor:
+                      type: array
+                      items:
+                        $ref: "definitions/api_descriptor.yaml"
+            examples:
+              auth_data_update:
+                summary: Push modified auth data
+                value:
+                  type: MODIFIED
+                  content:
+                    actions: []
+                    scopes: []
+                    api_descriptor: []
+      responses:
+        '200':
+          description: OK - Authentication data synchronized
+        '400':
+          description: Invalid format
+        '500':
+          description: Internal Server Error - Authentication data synchronization failed
+
+  /sessions:
+    get:
+      operationId: get_sessions
+      summary: List sessions
+      description: List currently active sessions.
+      tags:
+        - Sessions
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK - Sessions retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'definitions/session.yaml'
+
+  /sessions/{id}:
+    delete:
+      operationId: disable_session
+      summary: Revoke session
+      description: Revoke one active session by identifier.
+      tags:
+        - Sessions
+      x-scopes: ["administrator"]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: e3f1d9b0-8b8e-4f0c-8adf-f4ec5ac2d6fb
+      responses:
+        '200':
+          description: OK - Session revoked
+        '404':
+          description: Not Found - Session not found
+        '500':
+          description: Internal Server Error - Session revocation failed

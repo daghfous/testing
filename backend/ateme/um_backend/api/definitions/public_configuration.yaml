@@ -1,0 +1,15 @@
+type: object
+additionalProperties: false
+properties:
+  logout_timeout:
+    description: "Timeout period (in seconds) after user inactivity (only used in FE)"
+    type: integer
+    default: -1
+    minimum: -1
+  password_policy:
+    $ref: 'password_policy.yaml'
+example:
+  logout_timeout: 900
+  password_policy:
+    expiration_delay_in_days: 90
+    password_min_length: 12

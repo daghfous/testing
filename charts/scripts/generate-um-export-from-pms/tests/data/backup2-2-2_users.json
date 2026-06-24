@@ -1,0 +1,419 @@
+{
+   "amsBackupVersion": "2.2.2",
+   "devices": [],
+   "racks": [],
+   "slots": [],
+   "deviceRedundancyGroups": [],
+   "liveServiceRedundancyGroups": [],
+   "configuration": [
+      {
+         "key": "clientTimeZone",
+         "value": "Local",
+         "project": null,
+         "id": "636ccefa71ff9300528c7ea4"
+      },
+      {
+         "key": "ntpIpEnabled",
+         "value": "false",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7ea5"
+      },
+      {
+         "key": "ntpIp",
+         "value": null,
+         "project": null,
+         "id": "636ccefa71ff9300528c7ea6"
+      },
+      {
+         "key": "dateFormat",
+         "value": "DD/MM/YY",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ea7"
+      },
+      {
+         "key": "logoutTimeout",
+         "value": "3600000",
+         "project": null,
+         "id": "636ccefa71ff9300528c7ea8"
+      },
+      {
+         "key": "logoutTimeoutInfiniteOptionEnabled",
+         "value": "false",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ea9"
+      },
+      {
+         "key": "timeFormat",
+         "value": "HH:mm:ss",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7eaa"
+      },
+      {
+         "key": "timeLineZoom",
+         "value": "{\"min\":30,\"max\":2,\"debounceDelayDefault\":1,\"debounceMaxWaitDefault\":100,\"showEventDefault\":1000,\"showSubHeaderDefault\":false}",
+         "project": "scheduler",
+         "id": "636ccefa71ff9300528c7eab"
+      },
+      {
+         "key": "showPIDInHex",
+         "value": "false",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7eac"
+      },
+      {
+         "key": "isSingleModeForOutputLabelling",
+         "value": "false",
+         "project": "output-labels",
+         "id": "636ccefa71ff9300528c7ead"
+      },
+      {
+         "key": "thumbnailActiveLiveSelection",
+         "value": "false",
+         "project": "input-probing",
+         "id": "636ccefa71ff9300528c7eae"
+      },
+      {
+         "key": "thumbnailSynchronizeMuxInputsToLiveFilter",
+         "value": null,
+         "project": "input-probing",
+         "id": "636ccefa71ff9300528c7eaf"
+      },
+      {
+         "key": "thumbnailNbServicesPerTitanLive",
+         "value": "30",
+         "project": "input-probing",
+         "id": "636ccefa71ff9300528c7eb0"
+      },
+      {
+         "key": "thumbnailNbServicesPerVcaCard",
+         "value": "6",
+         "project": "input-probing",
+         "id": "636ccefa71ff9300528c7eb1"
+      },
+      {
+         "key": "thumbnailLiveTemplate",
+         "value": null,
+         "project": null,
+         "id": "636ccefa71ff9300528c7eb2"
+      },
+      {
+         "key": "thumbnailStaticAssignment",
+         "value": "true",
+         "project": "input-probing",
+         "id": "636ccefa71ff9300528c7eb3"
+      },
+      {
+         "key": "filterServicesListByRegEx",
+         "value": "false",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eb4"
+      },
+      {
+         "key": "autoServiceAssignRegEx",
+         "value": "^(\\d+)\\s*\\[.+\\]$",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eb5"
+      },
+      {
+         "key": "autoServiceAssignNbServices",
+         "value": "3",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eb6"
+      },
+      {
+         "key": "displayBitrate",
+         "value": "true",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eb7"
+      },
+      {
+         "key": "changeBitrateWhenUnassign",
+         "value": "false",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eb8"
+      },
+      {
+         "key": "bitrateHD",
+         "value": "2500000",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eb9"
+      },
+      {
+         "key": "bitrateMP2SD",
+         "value": "1510000",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7eba"
+      },
+      {
+         "key": "bitrateMP4SD",
+         "value": "970000",
+         "project": "video-router",
+         "id": "636ccefa71ff9300528c7ebb"
+      },
+      {
+         "key": "immediateStartRange",
+         "value": "60",
+         "project": "scheduler",
+         "id": "636ccefa71ff9300528c7ebc"
+      },
+      {
+         "key": "retentionDepth",
+         "value": "26",
+         "project": "scheduler",
+         "id": "636ccefa71ff9300528c7ebd"
+      },
+      {
+         "key": "checkNbRetryScheduler",
+         "value": "2",
+         "project": "scheduler",
+         "id": "636ccefa71ff9300528c7ebe"
+      },
+      {
+         "key": "enableIniFile",
+         "value": "false",
+         "project": null,
+         "id": "636ccefa71ff9300528c7ebf"
+      },
+      {
+         "key": "defaultIniFilePath",
+         "value": null,
+         "project": null,
+         "id": "636ccefa71ff9300528c7ec0"
+      },
+      {
+         "key": "defaultPassword",
+         "value": "$2a$10$cqeAkMBfxJhYBw8Wud3zgejWYkdLEofBLK6tcX6NE9Zx./FQrMcO2",
+         "project": "users",
+         "id": "636ccefa71ff9300528c7ec2"
+      },
+      {
+         "key": "licensesServerAddress",
+         "value": "{LICENSE_SERVER_IP_1}",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ec3"
+      },
+      {
+         "key": "licensesServerPort",
+         "value": "3541",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ec4"
+      },
+      {
+         "key": "redundancy",
+         "value": "{\"device\":{\"activate\":true,\"dmaActivate\":false},\"service\":{\"activate\":false,\"displayStandbyServices\":false},\"severity\":\"critical\"}",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ec5"
+      },
+      {
+         "key": "redundancyLimit",
+         "value": "{\"duringTimeAttempts\":300,\"maxReplaceNumber\":3}",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ec6"
+      },
+      {
+         "key": "createInstanceRedundancyState",
+         "value": "false",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ec7"
+      },
+      {
+         "key": "unlockConfiguration",
+         "value": "{\"timeOffsetRedundancy\":5,\"redundancyOnPreviousAlarm\":false,\"lastRestartDate\":1668075258741,\"isStarted\":false}",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ec8"
+      },
+      {
+         "key": "massUpdateServiceCardActions",
+         "value": "[\"Start/Stop\",\"Restart\",\"000000000000000000000001\",\"000000000000000000000002\",\"Replace by standby service\",\"Delete\",\"000000000000000000000013\"]",
+         "project": "services",
+         "id": "636ccefa71ff9300528c7ec9"
+      },
+      {
+         "key": "enableFilterDMAPTC",
+         "value": "true",
+         "project": "services",
+         "id": "636ccefa71ff9300528c7eca"
+      },
+      {
+         "key": "backupOutputs",
+         "value": "false",
+         "project": "services",
+         "id": "636ccefa71ff9300528c7ecb"
+      },
+      {
+         "key": "cloneWaitAlarmComparison",
+         "value": "{\"firstWait\":1000,\"nextWait\":500,\"nbRetries\":3}",
+         "project": "services",
+         "id": "636ccefa71ff9300528c7ecc"
+      },
+      {
+         "key": "alarmSound",
+         "value": "{}",
+         "project": "alarm",
+         "id": "636ccefa71ff9300528c7ecd"
+      },
+      {
+         "key": "alarmFilterViews",
+         "value": "[{\"overlayedIcon\":\"play\",\"titleKey\":\"menu.alarms.active\",\"customProps\":{\"operator\":\"$and\",\"uid\":\"0\",\"value\":[{\"operator\":\"state\",\"uid\":\"1\",\"value\":[{\"operator\":\"$eq\",\"uid\":\"2\",\"value\":\"on\"}]}]}},{\"overlayedIcon\":\"eye\",\"titleKey\":\"menu.alarms.ams\",\"customProps\":{\"operator\":\"$and\",\"uid\":\"0\",\"value\":[{\"operator\":\"origin\",\"uid\":\"1\",\"value\":[{\"operator\":\"$eq\",\"uid\":\"2\",\"value\":\"PILOT Manager\"}]}]}}]",
+         "project": "alarm",
+         "id": "636ccefa71ff9300528c7ece"
+      },
+      {
+         "key": "tagsDisplayAsDot",
+         "value": "false",
+         "project": null,
+         "id": "636ccefa71ff9300528c7ecf"
+      },
+      {
+         "key": "liveCpuLimit",
+         "value": "85",
+         "project": "services",
+         "id": "636ccefa71ff9300528c7ed0"
+      },
+      {
+         "key": "agentsLoopsTiming",
+         "value": "[{\"type\":\"live\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":2000,\"loopConfiguration\":1000,\"loopService\":1000},{\"type\":\"mux\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":2000,\"loopService\":2000,\"loopConfiguration\":4000},{\"type\":\"edge\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":2000,\"loopConfiguration\":1000},{\"type\":\"cm5000\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":10000},{\"type\":\"dr5000\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":10000},{\"type\":\"recorder\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":10000},{\"type\":\"gvMiranda\",\"loopAgent\":1000,\"loopHardware\":4000},{\"type\":\"blackMagic\",\"loopAgent\":1000,\"loopConfiguration\":4000},{\"type\":\"evertzMagnumQuartz\",\"loopAgent\":1000,\"loopConfiguration\":10000},{\"type\":\"enensysIpGuard\",\"loopAgent\":1000,\"loopHardware\":2000,\"loopConfiguration\":10000},{\"type\":\"ciscocatalystswitchsnmp\",\"loopAgent\":1000,\"loopHardware\":2000,\"loopConfiguration\":10000},{\"type\":\"imaginePlatiniumVx\",\"loopAgent\":1000,\"loopHardware\":2000,\"loopConfiguration\":10000},{\"type\":\"newtecM6100Modulators\",\"loopAgent\":1000,\"loopHardware\":2000,\"loopConfiguration\":10000,\"loopAlarm\":10000},{\"type\":\"newtecUssRf\",\"loopAgent\":1000,\"loopHardware\":2000,\"loopConfiguration\":10000,\"loopAlarm\":10000},{\"type\":\"nea\",\"loopAgent\":1000,\"loopAlarm\":1000,\"loopHardware\":2000}]",
+         "project": "application-configuration",
+         "id": "636ccefa71ff9300528c7ed1"
+      },
+      {
+         "key": "graphicalViewLinkConfiguration",
+         "value": "{\"userLink\":{\"paintStyle\":{\"stroke\":\"#1ea3f4\",\"strokeWidth\":1,\"dashstyle\":\"full\"},\"endpointStyle\":{\"fill\":\"#1ea3f4\",\"outlineStroke\":\"#1ea3f4\"},\"detachable\":false,\"connector\":[\"Straight\"]},\"topologyLink\":{\"paintStyle\":{\"stroke\":\"#000\",\"strokeWidth\":1,\"dashstyle\":\"full\"},\"endpointStyle\":{\"fill\":\"#000\",\"outlineStroke\":\"#000\"},\"detachable\":false,\"connector\":[\"Straight\"]},\"groupLink\":{\"paintStyle\":{\"stroke\":\"#911ef4\",\"strokeWidth\":2,\"dashstyle\":\"full\"},\"detachable\":false,\"endpointStyle\":{\"fill\":\"#911ef4\",\"outlineStroke\":\"#911ef4\"},\"connector\":[\"Straight\"]}}",
+         "project": "graphical-views",
+         "id": "636ccefa71ff9300528c7ed2"
+      },
+      {
+         "key": "graphicalViewNameConfiguration",
+         "value": "{\"direction\":\"left\",\"nbVisibleChar\":13,\"fontColor\":\"#000000\"}",
+         "project": "graphical-views",
+         "id": "636ccefa71ff9300528c7ed3"
+      },
+      {
+         "key": "alarmSettingsTable",
+         "value": "{\"debounceWait\":500,\"debounceMaxWait\":1000,\"eventInterval\":5000}",
+         "project": "alarm",
+         "id": "636ccefa71ff9300528c7ed4"
+      }
+   ],
+   "seriesEvents": [],
+   "colors": [],
+   "customLabels": [],
+   "ioLabels": {
+      "inputLabels": [],
+      "inputGroupLabels": [],
+      "outputLabels": [],
+      "outputGroupLabels": []
+   },
+   "affiliates": {
+      "affiliate": [],
+      "affiliateGroup": [],
+      "groupChannel": [],
+      "ird": []
+   },
+   "registry": [],
+   "files": [],
+   "recoveryPoints": [],
+   "tags": {
+      "tags": [],
+      "elementsTags": []
+   },
+   "matrixLabels": [],
+   "graphicalViews": {
+      "graphicalViews": [],
+      "graphicalViewObjects": [],
+      "graphicalViewLinkObjects": []
+   },
+   "massUpdate": [],
+   "users": {
+      "scopes": [
+         {
+            "id": "custom:prefix_1",
+            "label": "prefix_1",
+            "title": "name_1",
+            "description": "description_1",
+            "content": [
+               {
+                  "scope": "all:operator"
+               }
+            ]
+         }
+      ],
+      "users": [
+         {
+            "creation_id": {
+               "$oid": "636ccf392207a46fcd08242d"
+            },
+            "user_id": "9b9baaab9300ddfc54b793a451dc7fcf5e56b7c3",
+            "username": "bazerty",
+            "password": "aHp56KnLENRbLYmFwMFYMaQBXzArPESZCEcyjUqDAD9UjyHdXZvSSWFNYNVyqRsLuh45XbuhIl6pmfrCmLnWGw==",
+            "enabled": true,
+            "password_last_update": 1668075322.161013,
+            "scopes": [
+               "all:guest",
+               "usr:guest"
+            ],
+            "authenticate_mode": "local",
+            "first_login": true,
+            "internal": false
+         },
+         {
+            "creation_id": {
+               "$oid": "636ccf412207a46fcd08242f"
+            },
+            "user_id": "58e8a6509d5dd529a2b9273a080f330d8273e31e",
+            "username": "cazerty",
+            "password": "4Rtoixja96q/tVqaH2L6w3ZEEcXhW6NuyCJ5ypDLb7p9FIWT26bF1Nzy6EHnWaGnWfUB5Z+gnS6WOswT4vkEfg==",
+            "enabled": true,
+            "password_last_update": 1668075330.461228,
+            "scopes": [
+               "all:administrator",
+               "usr:guest"
+            ],
+            "authenticate_mode": "local",
+            "first_login": true,
+            "internal": false
+         },
+         {
+            "creation_id": {
+               "$oid": "636ccf492207a46fcd082431"
+            },
+            "user_id": "820cae644e9c42f1408fdfb1746178071509f935",
+            "username": "dazerty",
+            "password": "AIAZaA5279XmofqoMv3Iz1M5SbLEcOVrcxG8bSSAp50icMhwziKeJGQacZnIWy8Cqou4EtqQ8+Brqw5q49FwCg==",
+            "enabled": true,
+            "password_last_update": 1668075338.66104,
+            "scopes": [
+               "all:guest",
+               "usr:guest"
+            ],
+            "authenticate_mode": "local",
+            "first_login": true,
+            "internal": false
+         }
+      ],
+      "ldap_config": []
+   },
+   "instanceConnectivity": [],
+   "labelConnectivity": [],
+   "alarmCleaner": {
+      "retention_delay": {
+         "delay": 30,
+         "unit": "days"
+      },
+      "alarms_number": 100000,
+      "cleaning_period": 10
+   },
+   "alarmForwarder": {
+      "configuration": [
+         {
+            "key": "loopTimeout",
+            "value": "1000"
+         },
+         {
+            "key": "ping",
+            "value": "10"
+         }
+      ],
+      "restForwarder": []
+   }
+}

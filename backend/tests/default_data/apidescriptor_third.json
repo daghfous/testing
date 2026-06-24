@@ -1,0 +1,312 @@
+{
+    "prefix":"usr",
+    "url":"mainapp:8080",
+    "app_name":"mainapp",
+    "actions":[
+       {
+          "name":"get_test",
+          "label":"Users",
+          "title":"Get test",
+          "request":{
+             "method":"GET",
+             "route":"/test"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get test"
+       },
+       {
+          "name":"get_def",
+          "label":"Users",
+          "title":"Get API Definition",
+          "request":{
+             "method":"GET",
+             "route":"/definition"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get API Definition"
+       },
+       {
+          "name":"get_doc",
+          "label":"Users",
+          "title":"Get API Documentation",
+          "request":{
+             "method":"GET",
+             "route":"/documentation"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get API Documentation"
+       },
+       {
+          "name":"get_internal_users_test",
+          "label":"Users",
+          "title":"Get internal users test",
+          "request":{
+             "method":"GET",
+             "route":"/internal_users_test"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get Internal users test",
+          "internal":true
+       },
+       {
+          "name":"suba:get_ping",
+          "label":"sub",
+          "title":"Get ping",
+          "request":{
+             "method":"GET",
+             "route":"/subappA/ping"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Ping server"
+       },
+       {
+          "name":"suba:get_test",
+          "label":"sub",
+          "title":"Get test",
+          "request":{
+             "method":"GET",
+             "route":"/subappA/test"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get test"
+       },
+       {
+          "name":"suba:get_def",
+          "label":"sub",
+          "title":"Get API Definition",
+          "request":{
+             "method":"GET",
+             "route":"/subappA/definition"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get API Definition"
+       },
+       {
+          "name":"suba:get_doc",
+          "label":"sub",
+          "title":"Get API Documentation",
+          "request":{
+             "method":"GET",
+             "route":"/subappA/documentation"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get API Documentation"
+       },
+       {
+          "name":"subb:get_ping",
+          "label":"sub",
+          "title":"Get ping",
+          "request":{
+             "method":"GET",
+             "route":"/subappB/ping"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Ping server"
+       },
+       {
+          "name":"subb:get_test",
+          "label":"sub",
+          "title":"Get test",
+          "request":{
+             "method":"GET",
+             "route":"/subappB/test"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get test"
+       },
+       {
+          "name":"subb:get_def",
+          "label":"sub",
+          "title":"Get API Definition",
+          "request":{
+             "method":"GET",
+             "route":"/subappB/definition"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get API Definition"
+       },
+       {
+          "name":"subb:get_doc",
+          "label":"sub",
+          "title":"Get API Documentation",
+          "request":{
+             "method":"GET",
+             "route":"/subappB/documentation"
+          },
+          "prefix":"mainapp:usr",
+          "description":"Get API Documentation"
+       }
+    ],
+    "scopes":[
+       {
+          "id":"mainapp:usr:administrator",
+          "label":"Users",
+          "content":[
+             {
+                "action":"mainapp:usr:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:suba:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:suba:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:subb:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:subb:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             }
+          ],
+          "default":true,
+          "title":"Administrator - users",
+          "description":"Scope for all-access users on users and scopes management"
+       },
+       {
+          "id":"mainapp:usr:engineer",
+          "label":"Users",
+          "content":[
+             {
+                "action":"mainapp:usr:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:suba:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:suba:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:subb:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:subb:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             }
+          ],
+          "default":true,
+          "title":"Engineer - users",
+          "description":"Scope for configuration-enabled users with extra permissions on users and scopes"
+       },
+       {
+          "id":"mainapp:usr:guest",
+          "label":"Users",
+          "content":[
+             {
+                "action":"mainapp:usr:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:suba:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:suba:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:subb:get_ping",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             },
+             {
+                "action":"mainapp:usr:subb:get_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             }
+          ],
+          "default":true,
+          "title":"Guest - users",
+          "description":"Scope for users with permissions limited to self-user account management"
+       },
+       {
+          "id":"mainapp:usr:internal_administrator",
+          "label":"Users",
+          "content":[
+             {
+                "action":"mainapp:usr:get_internal_users_test",
+                "policy":"allow",
+                "resource":{
+                   
+                }
+             }
+          ],
+          "default":true,
+          "internal":true,
+          "title":"Internal_administrator - users",
+          "description":"Scope internal_administrator for Users"
+       }
+    ]
+ }

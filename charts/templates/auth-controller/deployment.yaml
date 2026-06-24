@@ -1,0 +1,128 @@
+{{- if .Values.authcontroller.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "um.authcontroller.fullname" . }}
+  labels:
+    # Need for debug_package
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: auth-controller
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      app.kubernetes.io/component: auth-controller
+      app.kubernetes.io/name: {{ .Chart.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        # Need for debug_package
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: auth-controller
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.Version }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        {{- if $podLabels := .Values.authcontroller.podLabels }}
+        {{ include "tplvalues.render" (dict "value" $podLabels "context" $) | nindent 8 | trim }}
+        {{- end }}
+    spec:
+      automountServiceAccountToken: {{ .Values.authcontroller.serviceAccount.automount }}
+      serviceAccountName: {{ include "um.authcontroller.serviceAccountName" . | trim }}
+      {{- if .Values.global.registry.private }}
+      imagePullSecrets:
+        - name: {{ template "um.secrets.registrycredentials.name" . }}
+      {{- end }}
+      {{- if .Values.authcontroller.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.authcontroller.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: "auth-controller"
+        image: "{{ .Values.global.registry.address }}/{{ .Values.global.registry.folderName }}{{ not .Values.global.registry.folderName | ternary "" "/" }}{{ .Values.authcontroller.image.repository }}:{{ .Values.authcontroller.image.tag }}"
+        imagePullPolicy: {{ .Values.global.system.images.pullPolicy }}
+        {{- if .Values.authcontroller.containerSecurityContext.enabled }}
+        securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.authcontroller.containerSecurityContext "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+{{ toYaml .Values.authcontroller.resources | indent 10 }}
+        args:
+          - "--um-url=http://{{ template "um.backend.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.backend.service.ports.http }}"
+          - "--namespace={{ .Release.Namespace }}"
+          - "--release-name={{ .Release.Name }}"
+          {{- if .Values.clusterDomain }}
+          - "--cluster-domain={{ .Values.clusterDomain }}"
+          {{- end }}
+          - "--cluster-scoped={{ .Values.authcontroller.clusterScoped }}"
+          - "--mode-f5={{ .Values.authcontroller.modeF5.enabled }}"
+          {{- if .Values.authcontroller.labelSelectorNamespace }}
+          - "--label-selector-namespace={{ .Values.authcontroller.labelSelectorNamespace }}"
+          {{- end }}
+          {{- if .Values.authcontroller.labelSelectorConfigmap }}
+          - "--label-selector-configmap={{ tpl .Values.authcontroller.labelSelectorConfigmap . }}"
+          {{- end }}
+          {{- if .Values.authcontroller.labelSelectorIngress }}
+          - "--label-selector-ingress={{ tpl .Values.authcontroller.labelSelectorIngress . }}"
+          {{- end }}
+          {{- if .Values.authcontroller.controllerIngressClass }}
+          - "--controller-ingress-class={{ tpl .Values.authcontroller.controllerIngressClass . }}"
+          {{- end }}
+          {{- if .Values.authcontroller.rateLimiterMaxDelay }}
+          - "--rate-limiter-max-delay={{ .Values.authcontroller.rateLimiterMaxDelay }}"
+          {{- end }}
+          {{- if .Values.authcontroller.logLevel }}
+          - "--loglevel={{ .Values.authcontroller.logLevel }}"
+          {{- end }}
+          {{- if and .Values.authcontroller.livenessProbe.enabled .Values.authcontroller.livenessProbe.tcpSocket.port }}
+          - "--health-probe-bind-addr=:{{ .Values.authcontroller.livenessProbe.tcpSocket.port }}"
+          {{- end }}
+          {{- range .Values.authcontroller.additionalArgs }}
+          - {{ . }}
+          {{- end }}
+        env:
+          # Pod name used to track which pod last processed an ingress
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          {{- if ((.Values.authcontroller.resources).limits).memory }}
+          # (since Go 1.19) hints at how much memory is available, which can help tune the GC.
+          - name: GOMEMLIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
+          {{- end}}
+          {{- if ((.Values.authcontroller.resources).limits).cpu }}
+          # GOMAXPROCS configures the number of processes to run. This defaults to the number of CPUs available.
+          - name: GOMAXPROCS
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.cpu
+          {{- end}}
+        {{- if .Values.authcontroller.livenessProbe.enabled }}
+        livenessProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.authcontroller.livenessProbe "enabled" "tcpSocket") "context" $) | nindent 10 }}
+          tcpSocket:
+            port: {{ .Values.authcontroller.livenessProbe.tcpSocket.port }}
+        {{- end }}
+    {{- with .Values.authcontroller.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      affinity:
+      {{- with .Values.authcontroller.nodeAffinity }}
+        nodeAffinity:
+{{ toYaml . | indent 10 }}
+      {{- end }}
+    {{- with .Values.authcontroller.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- if .Values.authcontroller.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "tplvalues.render" (dict "value" .Values.authcontroller.topologySpreadConstraints "context" .) | nindent 8 }}
+    {{- end }}
+{{- end }}

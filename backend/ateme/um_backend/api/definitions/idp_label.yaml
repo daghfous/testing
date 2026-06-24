@@ -1,0 +1,5 @@
+title: User friendly label of an Identity Provider used for its display
+description: This field is used to specify a user friendly label of an Identity Provider
+type: string
+example: "ldap_domain.com"
+

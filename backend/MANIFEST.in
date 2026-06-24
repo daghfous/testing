@@ -1,0 +1,4 @@
+include requirements.txt
+recursive-include ateme/um_backend/api *.yaml
+recursive-include ateme/um_backend/migration_files *.json
+recursive-include ateme/um_backend/sync_schema *.json

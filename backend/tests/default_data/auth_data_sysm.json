@@ -1,0 +1,340 @@
+{
+  "api_descriptors": [
+    {
+      "prefix": "sysm",
+      "url": "http://fake_sysmon:8081",
+      "app_name": "appsysm"
+    }
+  ],
+  "actions": [
+    {
+      "name": "get_def",
+      "label": "sysm",
+      "title": "Get API Definition",
+      "request": {
+        "method": "GET",
+        "route": "/definition"
+      },
+      "prefix": "sysm",
+      "description": "Get API Definition",
+      "internal": false
+    },
+    {
+      "name": "get_doc",
+      "label": "sysm",
+      "title": "Get API Documentation",
+      "request": {
+        "method": "GET",
+        "route": "/documentation"
+      },
+      "prefix": "sysm",
+      "description": "Get API Documentation",
+      "internal": false
+    },
+    {
+      "name": "get_ping",
+      "label": "sysm",
+      "title": "Ping",
+      "request": {
+        "method": "GET",
+        "route": "/ping"
+      },
+      "prefix": "sysm",
+      "description": "Ping",
+      "internal": false
+    },
+    {
+      "name": "deallocate",
+      "label": "sysm",
+      "title": "Set resources as not allocated in system-manager database",
+      "request": {
+        "method": "PUT",
+        "route": "/device_plugin/{resource_name}/{node}/deallocate"
+      },
+      "prefix": "sysm",
+      "description": "Set resources as not allocated in system-manager database",
+      "internal": false
+    },
+    {
+      "name": "get_nodes",
+      "label": "sysm",
+      "title": "Return nodes information",
+      "request": {
+        "method": "GET",
+        "route": "/nodes"
+      },
+      "prefix": "sysm",
+      "description": "Return nodes information",
+      "internal": false
+    },
+    {
+      "name": "get_node",
+      "label": "sysm",
+      "title": "Return information of the node",
+      "request": {
+        "method": "GET",
+        "route": "/node/{node}"
+      },
+      "prefix": "sysm",
+      "description": "Return information of the node",
+      "internal": false
+    },
+    {
+      "name": "get_processing_interfaces",
+      "label": "sysm",
+      "title": "Available processing interfaces",
+      "request": {
+        "method": "GET",
+        "route": "/network/processing_interfaces"
+      },
+      "prefix": "sysm",
+      "description": "Available processing interfaces",
+      "internal": false
+    },
+    {
+      "name": "get_node_nics",
+      "label": "sysm",
+      "title": "Return information of the node's NICs",
+      "request": {
+        "method": "GET",
+        "route": "/node/{node}/network/interfaces"
+      },
+      "prefix": "sysm",
+      "description": "Return information of the node's NICs",
+      "internal": false
+    },
+    {
+      "name": "get_node_nic",
+      "label": "sysm",
+      "title": "Return information of a node's NIC",
+      "request": {
+        "method": "GET",
+        "route": "/node/{node}/network/interfaces/{nic_name}"
+      },
+      "prefix": "sysm",
+      "description": "Return information of a node's NIC",
+      "internal": false
+    },
+    {
+      "name": "get_thresholds",
+      "label": "sysm",
+      "title": "Return thresholds information",
+      "request": {
+        "method": "GET",
+        "route": "/thresholds"
+      },
+      "prefix": "sysm",
+      "description": "Return thresholds information",
+      "internal": false
+    },
+    {
+      "name": "update_thresholds",
+      "label": "sysm",
+      "title": "Update thresholds",
+      "request": {
+        "method": "POST",
+        "route": "/thresholds"
+      },
+      "prefix": "sysm",
+      "description": "Update thresholds",
+      "internal": false
+    }
+  ],
+  "scopes": [
+    {
+      "id": "appsysm:sysm:administrator",
+      "label": "sysm",
+      "content": [
+        {
+          "action": "appsysm:sysm:get_def",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_doc",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_ping",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:deallocate",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_nodes",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_processing_interfaces",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysms:sysm:get_node_nics",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node_nic",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_thresholds",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:update_thresholds",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Administrator - appsysm",
+      "description": "Scope for all-access users on sysm"
+    },
+    {
+      "id": "appsysm:sysm:engineer",
+      "label": "sysm",
+      "content": [
+        {
+          "action": "appsysm:sysm:get_def",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_doc",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_ping",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:deallocate",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_nodes",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_processing_interfaces",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "aoosysm:sysm:get_node_nics",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node_nic",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_thresholds",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:update_thresholds",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Engineer - appsysm",
+      "description": "Scope for configuration-enabled users on sysm"
+    },
+    {
+      "id": "appsysm:sysm:operator",
+      "label": "sysm",
+      "content": [
+        {
+          "action": "appsysm:sysm:get_def",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_doc",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_ping",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:deallocate",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_nodes",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_processing_interfaces",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node_nics",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_node_nic",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:get_thresholds",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "appsysm:sysm:update_thresholds",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Operator - appsysm",
+      "description": "Scope for control-enabled users on sysm"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+title: Unique name of an Identity Provider
+description: This field is used to specified the unique name of an Identity Provider
+type: string
+example: "ldap_server.com"
+pattern: ^[a-zA-Z0-9_.-]+$

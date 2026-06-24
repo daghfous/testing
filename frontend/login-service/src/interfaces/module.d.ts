@@ -1,0 +1,5 @@
+declare module 'uuid'
+declare module 'lodash/*'
+declare module '@casl/*'
+declare module '@ateme/user-management/*'
+declare module '@ateme/cathodic-ui/*'

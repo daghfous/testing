@@ -1,0 +1,29 @@
+type: object
+required:
+  - base_url
+  - main_api
+properties:
+  base_url:
+    description: URL of the microservice
+    type: string
+    example: https://api.example.com/v1
+  main_api:
+    $ref: definition.yaml
+  app_name:
+    description: Application name used to create scope. 
+      We recommend to use your release name app here.
+    type: string
+    example: user-management
+  subapp_apis:
+    type: array
+    deprecated: true
+    items:
+      type: object
+      required:
+        - definition
+        - path
+      properties:
+        definition:
+          $ref: definition.yaml
+        path:
+          type: string

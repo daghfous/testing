@@ -1,0 +1,14 @@
+type: object
+additionalProperties: false
+required:
+  - prefix
+properties:
+  prefix:
+    $ref: 'prefix.yaml'
+    description: This param is defined in the OpenApi definition and is required in product use cases 
+  app_name:
+    type: string
+    description: This param coresponds to the release name of the application and is optional
+example:
+  prefix: usr
+  app_name: user-management

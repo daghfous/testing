@@ -1,0 +1,71 @@
+title: idp ldap config structure.
+description: This data structure describe the ldap_config format exposed by the API.
+type: object
+additionalProperties: false
+required:
+  - idp_type
+properties:
+  idp_type:
+    $ref: './idp_type.yaml'
+    enum:
+      - ldap
+  idp_name:
+    $ref: './idp_unique_name.yaml'
+  idp_label:
+    $ref: './idp_label.yaml'
+  server:
+    title: Address of the LDAP server
+    type: string
+  domain:
+    type: string
+  search:
+    type: string
+  group:
+    type: string
+  search_filter:
+    type: string
+    description: "Filter key used as ldap search_filter (ex: '(employeeType=developer)')"
+  use_ssl:
+    type: boolean
+    default: true
+  tls_config:
+    $ref: './idp_ldap_tls_config.yaml'
+  automatically_add_user:
+    deprecated: true
+    type: boolean
+    default: true
+    description: |
+      DEPRECATED This boolean parameter is used to automatically
+      create users and associate scopes on their first connection.
+  scopes:
+    type: array
+    title: user scopes
+    items:
+      $ref: 'scope_id.yaml'
+    description: Scopes (roles) that users must be associated with. Default value is all:guest
+  bind_dn:
+    type: string
+    description: LDAP admin username
+  bind_password:
+    type: string
+    description: LDAP admin password
+  user_filter:
+    type: string
+    description: "Filter key used to get user groups (ex: mail)"
+  deny_access:
+    type: boolean
+    default: true
+    description: Specify whether the connecting user will be denied access if it matches no mapper. If True and the user already exists, clears its scopes.
+  mappers:
+    type: array
+    title: idp mappers
+    items:
+      $ref: 'simple_mapper.yaml'
+    description: Mappers to determine which roles to assign when a user is logging
+example:
+  idp_type: ldap
+  idp_name: corp-ldap
+  idp_label: Corporate LDAP
+  server: ldap.example.com
+  search: dc=example,dc=com
+  group: cn

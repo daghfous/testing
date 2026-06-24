@@ -1,0 +1,12 @@
+authcontroller:
+  clusterRole:
+    additionalRules:
+      - apiGroups: [custom.io]
+        resources: [testresources]
+        verbs: [watch]
+  role:
+    additionalRules:
+      - apiGroups: [custom.io]
+        resources: [testresources]
+        verbs: [watch]
+

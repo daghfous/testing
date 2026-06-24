@@ -1,0 +1,33 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: Api Two
+  x-auth:
+    prefix: apitwo
+    label: Api Two
+    scope_descriptions:
+      administrator: Scope for administrator users on api two
+      guest: Scope for guest users on api two
+
+paths:
+  /two:
+    get:
+      x-scopes: ["guest"]
+      summary: Get Test
+      description: Get Test description
+      responses:
+        200:
+          description: OK
+    put:
+      x-scopes: ["administrator", "guest"]
+      summary: Put Test
+      description: Put Test description
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: object
+      responses:
+          200:
+            description: OK

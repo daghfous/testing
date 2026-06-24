@@ -1,0 +1,198 @@
+{
+  "component": "user-management",
+  "version": "4.0",
+  "generation_date": "01/03/2023 11:22:00",
+  "data": {
+    "4.0": [
+      {
+        "collection": "users",
+        "import_policy": {
+          "conflict_management": "abort",
+          "key_index": [
+            {
+              "user_id": "ASCENDING"
+            },
+            {
+              "username": "ASCENDING"
+            }
+          ]
+        },
+        "data": [
+          {
+            "creation_id": {
+              "$oid": "63ff27157de0c4ce8b9a7284"
+            },
+            "user_id": "19b32f7d5ea1b408e72bfbf6ba7b4b3720bc8d02",
+            "username": "Joe",
+            "password": "123456",
+            "enabled": true,
+            "password_last_update": false,
+            "scopes": [],
+            "authenticate_mode": "local",
+            "first_login": false,
+            "internal": false
+          },
+          {
+            "creation_id": {
+              "$oid": "63ff27157de0c4ce8b9a7285"
+            },
+            "user_id": "fe97666064e76f0bb9d795168e2e99b5f37e1cc7",
+            "username": "Jim",
+            "password": "123456",
+            "enabled": true,
+            "password_last_update": false,
+            "scopes": [],
+            "authenticate_mode": "local",
+            "first_login": false,
+            "internal": false
+          },
+          {
+            "creation_id": {
+              "$oid": "63ff27157de0c4ce8b9a7286"
+            },
+            "user_id": "fa006004ebea2822fc7118f35183219f2a3d13ff",
+            "username": "Bill",
+            "password": "123456",
+            "enabled": true,
+            "password_last_update": false,
+            "scopes": [],
+            "authenticate_mode": "local",
+            "first_login": false,
+            "internal": false
+          }
+        ]
+      },
+      {
+        "collection": "ldap_config",
+        "import_policy": {
+          "conflict_management": "override",
+          "key_index": [
+            {
+              "domain": "ASCENDING"
+            }
+          ]
+        },
+        "data": [
+          {
+            "domain": "ateme.com",
+            "server": "atm-infra.corp.ateme.com",
+            "search": "CN=Users,DC=corp,DC=ateme,DC=com",
+            "group": "S_SUPPORT"
+          },
+          {
+            "domain": "ateme-velizy.com",
+            "server": "atm-extra.corp.ateme.com",
+            "search": "CN=Users,DC=corp,DC=ateme,DC=com",
+            "group": "S_SUPPORT"
+          }
+        ]
+      },
+      {
+        "collection": "configuration",
+        "import_policy": {
+          "conflict_management": "override",
+          "key_index": []
+        },
+        "data": [
+          {
+            "log_activity": false,
+            "password_expiration": -1,
+            "max_successive_failed_login": 3,
+            "user_deactivation_period": 600,
+            "token_expiration": 3600,
+            "refresh_token_expiration": 7200,
+            "token_cleaning_period": 24
+          },
+          {
+            "log_activity": false,
+            "password_expiration": 9999,
+            "max_successive_failed_login": 3,
+            "user_deactivation_period": 600,
+            "token_expiration": 3600,
+            "refresh_token_expiration": 7200,
+            "token_cleaning_period": 24
+          }
+        ]
+      },
+      {
+        "collection": "scopes",
+        "import_policy": {
+          "conflict_management": "abort",
+          "key_index": [
+            {
+              "id": "ASCENDING"
+            }
+          ]
+        },
+        "data": [
+          {
+            "id": "usr:actor",
+            "label": "Actor",
+            "version": 3,
+            "content": [],
+            "title": "Actor actor"
+          },
+          {
+            "id": "usr:director",
+            "label": "Director",
+            "version": 3,
+            "content": [],
+            "title": "Director director"
+          }
+        ]
+      }
+    ],
+    "3.2": [
+      {
+        "collection": "users",
+        "import_policy": {
+          "conflict_management": "abort",
+          "key_index": [
+            {
+              "user_id": "ASCENDING"
+            },
+            {
+              "username": "ASCENDING"
+            },
+            {
+              "username": "ASCENDING",
+              "creation_date": "ASCENDING"
+            }
+          ]
+        },
+        "data": [
+          {
+            "creation_id": {
+              "$oid": "63ff27157de0c4ce8b9a7285"
+            },
+            "user_id": "fe97666064e76f0bb9d795168e2e99b5f37e1cc7",
+            "username": "Jim",
+            "password": "123456",
+            "enabled": true,
+            "password_last_update": false,
+            "scopes": [],
+            "authenticate_mode": "local",
+            "first_login": false,
+            "internal": false
+          },
+          {
+            "creation_id": {
+              "$oid": "63ff27157de0c4ce8b9a7284"
+            },
+            "user_id": "19b32f7d5ea1b408e72bfbf6ba7b4b3720bc8d02",
+            "username": "Joe",
+            "password": "123456",
+            "enabled": true,
+            "password_last_update": false,
+            "scopes": [],
+            "authenticate_mode": "local",
+            "first_login": false,
+            "internal": false
+          }
+        ]
+      }
+    ],
+    "1.3": []
+  },
+  "hash": "fbcf7b8a655b8f59d990e6ae05791def"
+}

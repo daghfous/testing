@@ -1,0 +1,20 @@
+title: Idp saml config structure.
+description: This data structure describe the saml_config format exposed by the API.
+allOf:
+  - type: object
+    required:
+      - idp_name
+      - idp_label
+      - entity_id
+      - single_sign_on_service
+      - single_logout_service
+      - cert_fingerprint
+  - $ref: './idp_saml_config.yaml'
+example:
+  idp_type: saml
+  idp_name: corp-saml
+  idp_label: Corporate SSO
+  entity_id: https://idp.example.com/metadata
+  single_sign_on_service: https://idp.example.com/sso
+  single_logout_service: https://idp.example.com/logout
+  cert_fingerprint: "<CERTIFICATE_FINGERPRINT_SHA1>"

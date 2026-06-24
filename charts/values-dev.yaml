@@ -1,0 +1,44 @@
+# Default values for user management
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+preUpgradeJob:
+  image:
+    repository: pilot-foundation-services/base-image-kubectl
+
+backend:
+  image:
+    repository: services/user-management/backend
+
+frontend:
+  image:
+    repository: services/user-management/frontend
+
+authcontroller:
+  image:
+    repository: services/user-management/auth-controller
+
+global:
+  # APP CONF
+  app:
+    configuration:
+      # dev, single, HA
+      mode: dev
+
+  # REGISTRY
+  registry:
+    folderName: ""
+    address: nexus-rennes.ateme.net:10443
+    private: false
+    user:
+      login: myuser
+      password: mypassword
+
+  # User management images
+  system:
+
+    application:
+      version: continuous
+
+    images:
+      pullPolicy: Always

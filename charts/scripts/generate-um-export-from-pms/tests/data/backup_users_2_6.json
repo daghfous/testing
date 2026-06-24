@@ -1,0 +1,387 @@
+{
+   "amsBackupVersion": "2.6.0",
+   "devices": [],
+   "racks": [],
+   "slots": [],
+   "deviceRedundancyGroups": [],
+   "liveServiceRedundancyGroups": [],
+   "configuration": [
+      {
+         "key": "clientTimeZone",
+         "value": "Local",
+         "project": null,
+         "id": "64abf3b9890dfb1e4f762fbe"
+      },
+      {
+         "key": "ntpIp",
+         "value": null,
+         "project": null,
+         "id": "64abf3b9890dfb1e4f762fc0"
+      },
+      {
+         "key": "dateFormat",
+         "value": "DD/MM/YY",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fc2"
+      },
+      {
+         "key": "logoutTimeout",
+         "value": "3600000",
+         "project": null,
+         "id": "64abf3b9890dfb1e4f762fc4"
+      },
+      {
+         "key": "logoutTimeoutInfiniteOptionEnabled",
+         "value": "false",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fc6"
+      },
+      {
+         "key": "timeFormat",
+         "value": "HH:mm:ss",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fc8"
+      },
+      {
+         "key": "timeLineZoom",
+         "value": "{\"min\":30,\"max\":2,\"debounceDelayDefault\":1,\"debounceMaxWaitDefault\":100,\"showEventDefault\":1000,\"showSubHeaderDefault\":false}",
+         "project": "scheduler",
+         "id": "64abf3b9890dfb1e4f762fca"
+      },
+      {
+         "key": "showPIDInHex",
+         "value": "false",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fcc"
+      },
+      {
+         "key": "isSingleModeForOutputLabelling",
+         "value": "false",
+         "project": "output-labels",
+         "id": "64abf3b9890dfb1e4f762fce"
+      },
+      {
+         "key": "immediateStartRange",
+         "value": "60",
+         "project": "scheduler",
+         "id": "64abf3b9890dfb1e4f762fd0"
+      },
+      {
+         "key": "retentionDepth",
+         "value": "26",
+         "project": "scheduler",
+         "id": "64abf3b9890dfb1e4f762fd2"
+      },
+      {
+         "key": "checkNbRetryScheduler",
+         "value": "2",
+         "project": "scheduler",
+         "id": "64abf3b9890dfb1e4f762fd4"
+      },
+      {
+         "key": "schedulerDefaultEventBgColor",
+         "value": "#008080",
+         "project": "scheduler",
+         "id": "64abf3b9890dfb1e4f762fd6"
+      },
+      {
+         "key": "enableIniFile",
+         "value": "false",
+         "project": null,
+         "id": "64abf3b9890dfb1e4f762fd8"
+      },
+      {
+         "key": "defaultIniFilePath",
+         "value": null,
+         "project": null,
+         "id": "64abf3b9890dfb1e4f762fda"
+      },
+      {
+         "key": "defaultPassword",
+         "value": "$2a$10$cqeAkMBfxJhYBw8Wud3zgejWYkdLEofBLK6tcX6NE9Zx./FQrMcO2",
+         "project": "users",
+         "id": "64abf3b9890dfb1e4f762fde"
+      },
+      {
+         "key": "licensesServerAddress",
+         "value": "http://{LICENSE_SERVER_IP_1}:3541",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fe0"
+      },
+      {
+         "key": "licensesServerV2Address",
+         "value": "http://172.29.2.206/license-server/api/",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fe2"
+      },
+      {
+         "key": "redundancy",
+         "value": "{\"device\":{\"activate\":true,\"dmaActivate\":false},\"service\":{\"activate\":false,\"displayStandbyServices\":false}}",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fe4"
+      },
+      {
+         "key": "redundancyLimit",
+         "value": "{\"duringTimeAttempts\":300,\"maxReplaceNumber\":3}",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fe6"
+      },
+      {
+         "key": "createInstanceRedundancyState",
+         "value": "false",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fe8"
+      },
+      {
+         "key": "unlockConfiguration",
+         "value": "{\"timeOffsetRedundancy\":5,\"redundancyOnPreviousAlarm\":false}",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762fea"
+      },
+      {
+         "key": "massUpdateServiceCardActions",
+         "value": "[\"Start/Stop\",\"Restart\",\"000000000000000000000001\",\"000000000000000000000002\",\"Replace by standby service\",\"Delete\",\"000000000000000000000013\"]",
+         "project": "services",
+         "id": "64abf3b9890dfb1e4f762fec"
+      },
+      {
+         "key": "enableFilterDMAPTC",
+         "value": "true",
+         "project": "services",
+         "id": "64abf3b9890dfb1e4f762fee"
+      },
+      {
+         "key": "backupOutputs",
+         "value": "false",
+         "project": "services",
+         "id": "64abf3b9890dfb1e4f762ff0"
+      },
+      {
+         "key": "cloneWaitAlarmComparison",
+         "value": "{\"firstWait\":1000,\"nextWait\":500,\"nbRetries\":3}",
+         "project": "services",
+         "id": "64abf3b9890dfb1e4f762ff2"
+      },
+      {
+         "key": "alarmSound",
+         "value": "{}",
+         "project": "alarm",
+         "id": "64abf3b9890dfb1e4f762ff4"
+      },
+      {
+         "key": "alarmFilterViews",
+         "value": "[{\"overlayedIcon\":\"play\",\"titleKey\":\"menu.alarms.active\",\"customProps\":{\"operator\":\"$and\",\"uid\":\"0\",\"value\":[{\"operator\":\"state\",\"uid\":\"1\",\"value\":[{\"operator\":\"$eq\",\"uid\":\"2\",\"value\":\"on\"}]}]}},{\"overlayedIcon\":\"eye\",\"titleKey\":\"menu.alarms.ams\",\"customProps\":{\"operator\":\"$and\",\"uid\":\"0\",\"value\":[{\"operator\":\"origin\",\"uid\":\"1\",\"value\":[{\"operator\":\"$eq\",\"uid\":\"2\",\"value\":\"PILOT Manager\"}]}]}},{\"overlayedIcon\":\"eye slash\",\"titleKey\":\"menu.alarms.mask\",\"customProps\":{\"operator\":\"$and\",\"uid\":\"0\",\"value\":[{\"operator\":\"state\",\"uid\":\"1\",\"value\":[{\"operator\":\"$eq\",\"uid\":\"2\",\"value\":\"on\"}]}]}}]",
+         "project": "alarm",
+         "id": "64abf3b9890dfb1e4f762ff6"
+      },
+      {
+         "key": "tagsDisplayAsDot",
+         "value": "false",
+         "project": null,
+         "id": "64abf3b9890dfb1e4f762ff8"
+      },
+      {
+         "key": "liveCpuLimit",
+         "value": "85",
+         "project": "services",
+         "id": "64abf3b9890dfb1e4f762ffa"
+      },
+      {
+         "key": "agentsSettings",
+         "value": "[{\"type\":\"live\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"live\",\"requestTimeout\":30000,\"retries\":1,\"pollingInterval\":1000,\"microServices\":true},{\"type\":\"liveCn\",\"requestTimeout\":10000,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"mux\",\"requestTimeout\":4000,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"edge\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"recorder\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"nea\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"neaCdn\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"neaDvrProxy\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"cm5000\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"dr5000\",\"requestTimeout\":1500,\"retries\":1,\"pollingInterval\":1000},{\"type\":\"gvMiranda\",\"requestTimeout\":1000,\"pollingInterval\":4000},{\"type\":\"blackMagic\",\"requestTimeout\":60000,\"retries\":1,\"pollingInterval\":4000},{\"type\":\"evertzMagnumQuartz\",\"requestTimeout\":4000,\"retries\":5,\"pollingInterval\":10000},{\"type\":\"enensysIpGuard\",\"requestTimeout\":60000,\"retries\":5,\"pollingInterval\":4000},{\"type\":\"imaginePlatiniumVx\",\"pollingInterval\":10000},{\"type\":\"ciscocatalystswitchsnmp\",\"requestTimeout\":1000,\"retries\":5,\"pollingInterval\":10000},{\"type\":\"newtecM6100Modulators\",\"requestTimeout\":1000,\"retries\":5,\"pollingInterval\":10000},{\"type\":\"enensysVyperModulator\",\"requestTimeout\":5000,\"retries\":2,\"pollingInterval\":5000},{\"type\":\"newtecUssRf\",\"requestTimeout\":1000,\"retries\":5,\"pollingInterval\":10000},{\"type\":\"dev1951\",\"requestTimeout\":5000,\"retries\":2,\"pollingInterval\":5000}]",
+         "project": "application-configuration",
+         "id": "64abf3b9890dfb1e4f762ffc"
+      },
+      {
+         "key": "graphicalViewLinkConfiguration",
+         "value": "{\"userLink\":{\"paintStyle\":{\"stroke\":\"#1ea3f4\",\"strokeWidth\":1,\"dashstyle\":\"full\"},\"endpointStyle\":{\"fill\":\"#1ea3f4\",\"outlineStroke\":\"#1ea3f4\"},\"detachable\":false,\"connector\":[\"Straight\"]},\"topologyLink\":{\"paintStyle\":{\"stroke\":\"#000\",\"strokeWidth\":1,\"dashstyle\":\"full\"},\"endpointStyle\":{\"fill\":\"#000\",\"outlineStroke\":\"#000\"},\"detachable\":false,\"connector\":[\"Straight\"]},\"groupLink\":{\"paintStyle\":{\"stroke\":\"#911ef4\",\"strokeWidth\":2,\"dashstyle\":\"full\"},\"detachable\":false,\"endpointStyle\":{\"fill\":\"#911ef4\",\"outlineStroke\":\"#911ef4\"},\"connector\":[\"Straight\"]}}",
+         "project": "graphical-views",
+         "id": "64abf3b9890dfb1e4f762ffe"
+      },
+      {
+         "key": "graphicalViewNameConfiguration",
+         "value": "{\"direction\":\"left\",\"nbVisibleChar\":13,\"fontColor\":\"#000000\",\"anchorPosition\":\"border\",\"namePosition\":\"bottom\"}",
+         "project": "graphical-views",
+         "id": "64abf3b9890dfb1e4f763000"
+      },
+      {
+         "key": "graphicalViewSubmapConfiguration",
+         "value": "{\"numberMeaning\":\"element\"}",
+         "project": "graphical-views",
+         "id": "64abf3b9890dfb1e4f763002"
+      },
+      {
+         "key": "graphicalViewElementDisplayConfiguration",
+         "value": "{\"ioDefaultSize\":\"large\",\"defaultRectangleNamePosition\":\"none\",\"inputCustomIcon\":null,\"outputCustomIcon\":null}",
+         "project": "graphical-views",
+         "id": "64abf3b9890dfb1e4f763004"
+      },
+      {
+         "key": "alarmSettingsTable",
+         "value": "{\"debounceWait\":500,\"debounceMaxWait\":1000,\"eventInterval\":5000}",
+         "project": "alarm",
+         "id": "64abf3b9890dfb1e4f763006"
+      }
+   ],
+   "seriesEvents": [],
+   "timelines": [],
+   "timelinesGroups": [],
+   "colors": [],
+   "ioLabels": {
+      "inputLabels": [],
+      "inputGroupLabels": [],
+      "outputLabels": [],
+      "outputGroupLabels": []
+   },
+   "affiliates": {
+      "affiliate": [],
+      "affiliateGroup": [],
+      "groupChannel": [],
+      "ird": []
+   },
+   "registry": [],
+   "files": [],
+   "recoveryPoints": [],
+   "recoveryPointDevices": [],
+   "tags": {
+      "tags": [],
+      "elementsTags": []
+   },
+   "matrixLabels": [],
+   "graphicalViews": {
+      "graphicalViews": [],
+      "graphicalViewObjects": [],
+      "graphicalViewLinkObjects": [],
+      "pilotManagerId": "64abf3b6e52041ec07d43f26"
+   },
+   "massUpdate": [],
+   "users": {
+      "scopes": [
+         {
+            "id": "custom:prefix_1",
+            "label": "prefix_1",
+            "title": "name_1",
+            "description": "description_1",
+            "content": [
+               {
+                  "scope": "usr:administrator"
+               }
+            ]
+         }
+      ],
+      "users": [
+         {
+            "creation_id": {
+               "$oid": "64ac03f70d923e346a568e72"
+            },
+            "user_id": "2384112d047f7e183e6b66237750a87ff5b8dd81",
+            "username": "bazerty",
+            "password": "/6xyJWQqEP9PtgCjUdCaJQSpPHZ73phPvBs2WTTM7LhX2IlJcbHI1pXZnWzSwvQkvHHy5RJSIzrpd2xBTrrI9Q==",
+            "enabled": true,
+            "password_last_update": 1688994808.564045,
+            "scopes": [
+               "all:guest"
+            ],
+            "authenticate_mode": "local",
+            "first_login": true,
+            "internal": false
+         },
+         {
+            "creation_id": {
+               "$oid": "64ac03ff0d923e346a568e74"
+            },
+            "user_id": "b8a84b6e45769495281e1bde0bdef2680b7454aa",
+            "username": "cazerty",
+            "password": "9QT2b68d8K2xK6AarbwOP7QKkHhn4l/C2CsUqC4UfUIxasvH+MDjJkFbcgFMBwOl2r800FnvLlnHS7wS/f5ViQ==",
+            "enabled": true,
+            "password_last_update": 1688994816.166596,
+            "scopes": [
+               "all:administrator"
+            ],
+            "authenticate_mode": "local",
+            "first_login": true,
+            "internal": false
+         },
+         {
+            "creation_id": {
+               "$oid": "64ac04060d923e346a568e76"
+            },
+            "user_id": "19e13032f08fec66c109ad18a7f748c35c74ede6",
+            "username": "dazerty",
+            "password": "cgssSi/Ay3V0plM1/lHNvkumyL+jRJACMj2oPtVvZjfraEhZd35uU5NHmZieRqUC+e49ELz+MhHRw0rLezbe9A==",
+            "enabled": true,
+            "password_last_update": 1688994823.665554,
+            "scopes": [
+               "all:guest"
+            ],
+            "authenticate_mode": "local",
+            "first_login": true,
+            "internal": false
+         }
+      ],
+      "ldap_config": []
+   },
+   "instanceConnectivity": [],
+   "labelConnectivity": [],
+   "pamCleaner": {
+      "retentionPeriod": 30,
+      "retentionPeriodUnit": "days",
+      "maxAlarms": 100000,
+      "cleaningPeriod": 10
+   },
+   "alarmForwarder": {
+      "configuration": [
+         {
+            "key": "loopTimeout",
+            "value": "1000"
+         },
+         {
+            "key": "ping",
+            "value": "10"
+         },
+         {
+            "key": "enableEmailSending",
+            "value": "false"
+         },
+         {
+            "key": "enableAccessCredentials",
+            "value": "true"
+         },
+         {
+            "key": "pilotManagerIp",
+            "value": "127.0.0.1"
+         },
+         {
+            "key": "flowMode",
+            "value": "{\"days\":0,\"hours\":8,\"minutes\":0}"
+         },
+         {
+            "key": "transporter",
+            "value": "{\"senderAddress\":\"\",\"smtpServer\":\"\",\"smtpPort\":25,\"login\":\"\",\"password\":\"\"}"
+         }
+      ],
+      "restForwarder": [],
+      "emailForwarder": []
+   },
+   "alarmRules": [
+      {
+         "id": "64ac03e43b8ff2773e0de2c5",
+         "enable": true,
+         "order": 1,
+         "ruleCriteria": {
+            "severities": [
+               500,
+               600
+            ],
+            "probableCauseList": [],
+            "specificProblem": "",
+            "deviceIdsList": [],
+            "deviceNamesList": [],
+            "deviceTypesList": [],
+            "resourceList": []
+         },
+         "action": 2,
+         "payload": null
+      }
+   ]
+}

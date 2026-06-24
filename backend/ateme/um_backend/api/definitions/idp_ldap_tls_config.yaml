@@ -1,0 +1,24 @@
+title: idp ldap tls config.
+description: This data structure describe the ldap_tls_config format exposed by the API.
+type: object
+required:
+  - private_key_file
+  - certificate_file
+  - ca_certs_file
+properties:
+  certificate_file:
+    title: Local client certificate file
+    description: The path to the local client certificate file used for LDAP TLS configuration
+    type: string
+  private_key_file:
+    title: Local client private_key file
+    description: The path to the local client private key file used for LDAP TLS configuration
+    type: string
+  ca_certs_file:
+    title: Local ca cert file
+    description: The path to the local CA certificate file used for LDAP TLS configuration
+    type: string
+example:
+  certificate_file: /etc/ssl/certs/client.crt
+  private_key_file: /etc/ssl/private/client.key
+  ca_certs_file: /etc/ssl/certs/ca.crt

@@ -1,0 +1,141 @@
+actions.json: |-
+  [
+    {
+      "name": "put_one",
+      "label": "Api One",
+      "title": "Put Test",
+      "request": {
+        "method": "PUT",
+        "route": "/one"
+      },
+      "prefix": "my_app_pattern:apione",
+      "description": "Put Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    },
+    {
+      "name": "get_one",
+      "label": "Api One",
+      "title": "Get Test",
+      "request": {
+        "method": "GET",
+        "route": "/one"
+      },
+      "prefix": "my_app_pattern:apione",
+      "description": "Get Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    },
+    {
+      "name": "get_two",
+      "label": "Api Two",
+      "title": "Get Test",
+      "request": {
+        "method": "GET",
+        "route": "/two"
+      },
+      "prefix": "my_app_pattern:apitwo",
+      "description": "Get Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    },
+    {
+      "name": "put_two",
+      "label": "Api Two",
+      "title": "Put Test",
+      "request": {
+        "method": "PUT",
+        "route": "/two"
+      },
+      "prefix": "my_app_pattern:apitwo",
+      "description": "Put Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    }
+  ]
+api_descriptors.json: |-
+  [
+    {
+      "prefix": "apione",
+      "url": "http://fake_url:8081",
+      "app_name": "my_app_pattern"
+    },
+    {
+      "prefix": "apitwo",
+      "url": "http://fake_url:8082",
+      "app_name": "my_app_pattern"
+    }
+  ]
+scopes.json: |-
+  [
+    {
+      "id": "my_app_pattern:apione:administrator",
+      "label": "my_app_pattern - Api One",
+      "content": [
+        {
+          "action": "my_app_pattern:apione:put_one",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "my_app_pattern:apione:get_one",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Administrator - my_app_pattern - api one",
+      "description": "Scope for administrator users on api one"
+    },
+    {
+      "id": "my_app_pattern:apione:guest",
+      "label": "my_app_pattern - Api One",
+      "content": [
+        {
+          "action": "my_app_pattern:apione:get_one",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Guest - my_app_pattern - api one",
+      "description": "Scope for guest users on api one"
+    },
+    {
+      "id": "my_app_pattern:apitwo:guest",
+      "label": "my_app_pattern - Api Two",
+      "content": [
+        {
+          "action": "my_app_pattern:apitwo:get_two",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "my_app_pattern:apitwo:put_two",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Guest - my_app_pattern - api two",
+      "description": "Scope for guest users on api two"
+    },
+    {
+      "id": "my_app_pattern:apitwo:administrator",
+      "label": "my_app_pattern - Api Two",
+      "content": [
+        {
+          "action": "my_app_pattern:apitwo:put_two",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Administrator - my_app_pattern - api two",
+      "description": "Scope for administrator users on api two"
+    }
+  ]

@@ -1,0 +1,778 @@
+# Default values for user management
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Default Kubernetes cluster domain
+# @section -- Root
+clusterDomain: cluster.local
+
+global:
+  app:
+    configuration:
+      # -- Define application mode (single or HA)
+      # @section -- Global
+      mode: single
+  database:
+    # -- Define if database in cluster mode
+    # @section -- Global
+    incluster: true
+    # -- Define database port to expose
+    # @section -- Global
+    port: '27017'
+    remote:
+      # -- Define remote database url
+      # @section -- Global
+      url:
+  registry:
+    # -- Registry address to pull the images from
+    # @section -- Global
+    address: nexus-dev.ateme.net:10443
+    # -- Folder where are located the images on the registry
+    # @section -- Global
+    folderName: products/pilot/manager-foundations
+    # -- `true` if the registry requires credentials, else `false`
+    # @section -- Global
+    private: true
+    user:
+      # -- Required when `global.registry.private` is `true`, set the username to use as credentials
+      # @section -- Global
+      login: myuser
+      # -- Required when `global.registry.private` is `true`, set the password to use as credentials
+      # @section -- Global
+      password: mypassword
+  cluster:
+    # -- Name of the cluster
+    # @section -- Global
+    name: local
+  system:
+    application:
+      # -- Application name (required by Devops)
+      # @section -- Global
+      name: user-management
+      # -- Application version (required by Devops)
+      # @section -- Global
+      version: continuous
+      # -- Whether the application is deployed in PMF context
+      # @section -- Global
+      deployingWithPfs: false
+    images:
+      # -- Pull policy
+      # @section -- Global
+      pullPolicy: IfNotPresent
+  compatibility:
+    # -- Enable compatibility mode for security context (for OpenShift compatibility)
+    # @section -- Global
+    openshift:
+      # OpenShift compatibility mode for securityContext adaptation
+      # "auto" (default): automatically detect OpenShift and adapt securityContext
+      # "force": always adapt securityContext (use in values-openshift.yaml - PMF)
+      adaptSecurityContext: auto
+
+ingress:
+  # -- Flag to enable the ingress
+  # @section -- Ingress
+  enabled: true
+
+preUpgradeJob:
+  # -- Mount a ServiceAccount's credentials
+  # @section -- Pre-Upgrade Job
+  automountServiceAccountToken: true
+  image:
+    # -- Repository to fetch the preUpgradeJob image from
+    # @section -- Pre-Upgrade Job
+    repository: base-image-kubectl
+    # -- Tag of the preUpgradeJob image to fetch
+    # @section -- Pre-Upgrade Job
+    tag: 1.30.7
+  # -- Labels to add to the preUpgradeJob pod
+  # @section -- Pre-Upgrade Job
+  podLabels: {}
+  # -- See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  # @section -- Pre-Upgrade Job
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  # -- See https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/#create-a-pod-that-gets-scheduled-to-your-chosen-node
+  # @section -- Pre-Upgrade Job
+  nodeSelector: {}
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  # @section -- Pre-Upgrade Job
+  affinity: {}
+
+backend:
+  # -- Flag to enable UM Backend
+  # @section -- Backend
+  enabled: true
+  image:
+    # -- Repository to fetch the backend image from
+    # @section -- Backend
+    repository: user-management/backend
+    # -- Tag of the backend image to fetch
+    # @section -- Backend
+    tag: 14.13.2
+  # @ignored DO NOT EDIT
+  nameOverride: umbackend
+  # @ignored DO NOT EDIT
+  fullnameOverride:
+  # -- Level of the logging
+  # @section -- Backend
+  logLevel: INFO
+  # -- Define how many workers to set for LDAP operations
+  # @section -- Backend
+  maxWorkers: 5
+  # -- Ldap sync period (in seconds)
+  # @section -- Backend
+  ldapSyncPeriod: 86400
+  # -- Ldap log detail level (0: OFF, ..., 255: EXTENDED). Requires logLevel set to DEBUG.
+  # LDAP logging configuration
+  # See python-ldap documentation: https://www.python-ldap.org/en/latest/reference/ldap.html#ldap.set_option
+  # See ldap3 original documentation for reference: https://ldap3.readthedocs.io/en/latest/logging.html
+  # @section -- Backend
+  ldapLogDetailLevel: 0
+  # -- Ldap network timeout (in seconds)
+  # @section -- Backend
+  ldapNetworkTimeout: 10
+  # -- Flag to enable/disable the token ip validation
+  # @section -- Backend
+  tokenIpValidation: false
+  # -- Maximum number of scopes returned per page when getting scopes from the API
+  # 0 means no limit
+  # @section -- Backend
+  scopesPageLimit: 200
+  service:
+    # -- Type of the service (ClusterIP, NodePort)
+    # @section -- Backend
+    type: ClusterIP
+    ports:
+      # -- Port of the service
+      # @section -- Backend
+      http: 2529
+  containerPorts:
+    # -- Port of the container
+    # @section -- Backend
+    http: 2529
+  # See https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    # -- Define the strategy to use for updating the deployment (RollingUpdate or Recreate)
+    # @section -- Backend
+    type: RollingUpdate
+    rollingUpdate:
+      # -- Optional field that specifies the maximum number of Pods that can be unavailable during the update process
+      # @section -- Backend
+      maxUnavailable: 1
+  # -- Name of the secret that will contain the default values (users, scopes, etc.) <sup>(1)</sup>
+  # @section -- Backend
+  defaultValuesSecretName: ''
+  ingress:
+    auth:
+      # -- Define the ingress class of the Auth Ingress
+      # @section -- Backend
+      class: nginx
+      # -- Extra paths to use in the Ingress
+      # @section -- Backend
+      extraPaths: []
+      # -- Hostname to use in the Ingress
+      # @section -- Backend
+      hostname: ''
+      # -- Extra hosts to use in the Ingress
+      # @section -- Backend
+      extraHosts: []
+      # -- TLS configuration for the Ingress (see https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)
+      # @section -- Backend
+      tls: []
+      # -- Annotations to use in the Ingress
+      # @section -- Backend
+      annotations:
+        nginx.ingress.kubernetes.io/auth-response-headers: X-User, X-IDP-Name
+        nginx.ingress.kubernetes.io/proxy-body-size: 20M
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+        nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+        nginx.ingress.kubernetes.io/use-regex: 'true'
+        nginx.ingress.kubernetes.io/auth-url: http://{{ .Release.Name }}-umbackend.{{
+          .Release.Namespace }}.svc.cluster.local:{{ .Values.backend.service.ports.http
+          }}/token_introspection
+        nginx.ingress.kubernetes.io/auth-method: POST
+        # F5 annotations
+        nginx.org/path-regex: case_sensitive
+        nginx.org/rewrite-target: /$1
+      # -- Additional annotations to use in the Ingress
+      # @section -- Backend
+      additionalAnnotations: {}
+      # -- Path to use in the Ingress
+      # @section -- Backend
+      path: /{{ .Release.Name 
+        }}/users/(?!(?:ping|readiness|token|refresh_token|admin|definition|documentation|public/configuration|authenticate_mode|idp_sso/[a-zA-Z0-9_.-]+|saml/callback/[a-zA-Z0-9_.-]+|idp_metadata/[a-zA-Z0-9_.-]+)(?:/|$))(.*)
+      # if path contains other character than alphanumeric, we have to use
+      # ImplementationSpecific instead of Prefix
+      # https://kubernetes.github.io/ingress-nginx/faq/#validation-of-path
+      # -- Type of the path to use in the Ingress
+      # @section -- Backend
+      pathType: ImplementationSpecific
+    noauth:
+      # -- Define the ingress class of the NoAuth Ingress
+      # @section -- Backend
+      class: nginx
+      # -- Extra paths to use in the Ingress
+      # @section -- Backend
+      extraPaths: []
+      # -- Hostname to use in the Ingress
+      # @section -- Backend
+      hostname: ''
+      # -- Extra hosts to use in the Ingress
+      # @section -- Backend
+      extraHosts: []
+      # -- TLS configuration for the Ingress (see https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)
+      # @section -- Backend
+      tls: []
+      # -- Annotations to use in the Ingress
+      # @section -- Backend
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 20M
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+        nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+        # F5 annotations
+        nginx.org/path-regex: case_sensitive
+        nginx.org/rewrite-target: /$1
+      # -- Additional annotations to use in the Ingress
+      # @section -- Backend
+      additionalAnnotations: {}
+      # -- Path to use in the Ingress
+      # @section -- Backend
+      path: /{{ .Release.Name 
+        }}/users/(ping|readiness|token|refresh_token|admin|definition|documentation|public/configuration|authenticate_mode|idp_sso/[a-zA-Z0-9_.-]+|saml/callback/[a-zA-Z0-9_.-]+|idp_metadata/[a-zA-Z0-9_.-]+)$
+      # if path contains other character than alphanumeric, we have to use
+      # ImplementationSpecific instead of Prefix
+      # https://kubernetes.github.io/ingress-nginx/faq/#validation-of-path
+      # -- Type of the path to use in the Ingress
+      # @section -- Backend
+      pathType: ImplementationSpecific
+  ## Configure extra options for frontend containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable default livenessProbe
+    # @section -- Backend
+    enabled: true
+    # -- Initial delay seconds for livenessProbe
+    # @section -- Backend
+    initialDelaySeconds: 60
+    # -- Period seconds for livenessProbe
+    # @section -- Backend
+    periodSeconds: 10
+    # -- Timeout seconds for livenessProbe
+    # @section -- Backend
+    timeoutSeconds: 5
+    # -- Failure threshold for livenessProbe
+    # @section -- Backend
+    failureThreshold: 10
+    # -- Success threshold for livenessProbe
+    # @section -- Backend
+    successThreshold: 1
+  readinessProbe:
+    # -- Enable default readinessProbe
+    # @section -- Backend
+    enabled: true
+    # -- Initial delay seconds for readinessProbe
+    # @section -- Backend
+    initialDelaySeconds: 10
+    # -- Period seconds for readinessProbe
+    # @section -- Backend
+    periodSeconds: 10
+    # -- Timeout seconds for readinessProbe
+    # @section -- Backend
+    timeoutSeconds: 5
+    # -- Failure threshold for readinessProbe
+    # @section -- Backend
+    failureThreshold: 3
+    # -- Success threshold for readinessProbe
+    # @section -- Backend
+    successThreshold: 1
+  startupProbe:
+    # -- Enable default startupProbe
+    # @section -- Backend
+    enabled: false
+    # -- Initial delay seconds for startupProbe
+    # @section -- Backend
+    initialDelaySeconds: 0
+    # -- Period seconds for startupProbe
+    # @section -- Backend
+    periodSeconds: 10
+    # -- Timeout seconds for startupProbe
+    # @section -- Backend
+    timeoutSeconds: 5
+    # -- Failure threshold for startupProbe
+    # @section -- Backend
+    failureThreshold: 6
+    # -- Success threshold for startupProbe
+    # @section -- Backend
+    successThreshold: 1
+  # -- Custom livenessProbe that overrides the default one
+  # @section -- Backend
+  customLivenessProbe: {}
+  # -- Custom readinessProbe that overrides the default one
+  # @section -- Backend
+  customReadinessProbe: {}
+  # -- Custom startupProbe that overrides the default one
+  # @section -- Backend
+  customStartupProbe: {}
+  # -- Labels to add to the UM backend pod
+  # @section -- Backend
+  podLabels: {}
+  # -- Pod security context (an `enabled` field is required), see https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # @section -- Backend
+  podSecurityContext:
+    enabled: true
+    fsGroup: 3000
+    seccompProfile:
+      type: RuntimeDefault
+  # -- Container security context (an `enabled` field is required), see https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # @section -- Backend
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 2000
+    runAsGroup: 2000
+    runAsNonRoot: true
+    privileged: false
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+  # -- See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  # @section -- Backend
+  resources:
+    limits:
+      cpu: 600m
+      memory: 256Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  # @section -- Backend
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+  # -- See https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/#create-a-pod-that-gets-scheduled-to-your-chosen-node
+  # @section -- Backend
+  nodeSelector: {}
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  # @section -- Backend
+  tolerations: []
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+  # @section -- Backend
+  topologySpreadConstraints: []
+
+frontend:
+  # -- Flag to enable UM Frontend
+  # @section -- Frontend
+  enabled: true
+  # -- environment variables from configMap to pass to the container
+  # @section -- Frontend
+  envFromConfigMapName:
+  # -- Sets the maximum number of worker processes
+  # @section -- Frontend
+  workerProcesses: 2
+  # -- Enable xtrace mode to print out each command executed in entrypoint script
+  # @section -- Frontend
+  debugEntrypoint: false
+  image:
+    # -- Repository to fetch the frontend image from
+    # @section -- Frontend
+    repository: user-management/frontend
+    # -- Tag of the frontend image to fetch
+    # @section -- Frontend
+    tag: 14.13.2
+  # @ignored DO NOT EDIT
+  nameOverride: umfrontend
+  # @ignored DO NOT EDIT
+  fullnameOverride:
+  containerPorts:
+    # -- Port of the container
+    # @section -- Frontend
+    http: 2529
+  service:
+    # -- Type of the service (ClusterIP, NodePort)
+    # @section -- Frontend
+    type: ClusterIP
+    ports:
+      # -- Port of the service
+      # @section -- Frontend
+      http: 2525
+  # See https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    # -- Define the strategy to use for updating the deployment (RollingUpdate or Recreate)
+    # @section -- Frontend
+    type: RollingUpdate
+    rollingUpdate:
+      # -- Optional field that specifies the maximum number of Pods that can be unavailable during the update process.
+      # @section -- Frontend
+      maxUnavailable: 1
+  # -- Additional environment variables to pass to the container
+  # @section -- Frontend
+  extraEnvVars:
+  - name: BASE_URL
+    value: /{{ .Release.Name }}/
+  ingress:
+    noauth:
+      # -- Define the ingress class of the NoAuth Ingress
+      # @section -- Frontend
+      class: nginx
+      # -- Extra paths to use in the Ingress
+      # @section -- Frontend
+      extraPaths: []
+      # -- Hostname to use in the Ingress
+      # @section -- Frontend
+      hostname: ''
+      # -- Extra hosts to use in the Ingress
+      # @section -- Frontend
+      extraHosts: []
+      # -- TLS configuration for the Ingress (see https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)
+      # @section -- Frontend
+      tls: []
+      # -- Annotations to use in the Ingress
+      # @section -- Frontend
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 20M
+        nginx.ingress.kubernetes.io/rewrite-target: /$1
+        nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+        # F5 annotations
+        nginx.org/path-regex: case_sensitive
+        nginx.org/rewrite-target: /$1
+      # -- Additional annotations to use in the Ingress
+      # @section -- Frontend
+      additionalAnnotations: {}
+      # -- Path to use in the Ingress
+      # @section -- Frontend
+      path: /{{ .Release.Name }}/?(.*)
+      # if path contains other character than alphanumeric, we have to use
+      # ImplementationSpecific instead of Prefix
+      # https://kubernetes.github.io/ingress-nginx/faq/#validation-of-path
+      # -- Type of the path to use in the Ingress
+      # @section -- Frontend
+      pathType: ImplementationSpecific
+  ## Configure extra options for frontend containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable default livenessProbe
+    # @section -- Frontend
+    enabled: true
+    # -- Initial delay seconds for livenessProbe
+    # @section -- Frontend
+    initialDelaySeconds: 10
+    # -- Period seconds for livenessProbe
+    # @section -- Frontend
+    periodSeconds: 10
+    # -- Timeout seconds for livenessProbe
+    # @section -- Frontend
+    timeoutSeconds: 5
+    # -- Failure threshold for livenessProbe
+    # @section -- Frontend
+    failureThreshold: 10
+    # -- Success threshold for livenessProbe
+    # @section -- Frontend
+    successThreshold: 1
+  readinessProbe:
+    # -- Enable default readinessProbe
+    # @section -- Frontend
+    enabled: true
+    # -- Initial delay seconds for readinessProbe
+    # @section -- Frontend
+    initialDelaySeconds: 0
+    # -- Period seconds for readinessProbe
+    # @section -- Frontend
+    periodSeconds: 10
+    # -- Timeout seconds for readinessProbe
+    # @section -- Frontend
+    timeoutSeconds: 5
+    # -- Failure threshold for readinessProbe
+    # @section -- Frontend
+    failureThreshold: 10
+    # -- Success threshold for readinessProbe
+    # @section -- Frontend
+    successThreshold: 1
+  startupProbe:
+    # -- Enable default startupProbe
+    # @section -- Frontend
+    enabled: false
+    # -- Initial delay seconds for startupProbe
+    # @section -- Frontend
+    initialDelaySeconds: 0
+    # -- Period seconds for startupProbe
+    # @section -- Frontend
+    periodSeconds: 10
+    # -- Timeout seconds for startupProbe
+    # @section -- Frontend
+    timeoutSeconds: 5
+    # -- Failure threshold for startupProbe
+    # @section -- Frontend
+    failureThreshold: 6
+    # -- Success threshold for startupProbe
+    # @section -- Frontend
+    successThreshold: 1
+  # -- Custom livenessProbe that overrides the default one
+  # @section -- Frontend
+  customLivenessProbe: {}
+  # -- Custom readinessProbe that overrides the default one
+  # @section -- Frontend
+  customReadinessProbe: {}
+  # -- Custom startupProbe that overrides the default one
+  # @section -- Frontend
+  customStartupProbe: {}
+  # -- Labels to add to the UM frontend pod
+  # @section -- Frontend
+  podLabels: {}
+  # -- Pod security context (an `enabled` field is required), see https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # @section -- Frontend
+  podSecurityContext:
+    enabled: true
+    fsGroup: 3000
+    seccompProfile:
+      type: RuntimeDefault
+  # -- Container security context (an `enabled` field is required), see https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # @section -- Frontend
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 2000
+    runAsGroup: 2000
+    runAsNonRoot: true
+    privileged: false
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+  # -- See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  # @section -- Frontend
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 50m
+      memory: 256Mi
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  # @section -- Frontend
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+  # -- See https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/#create-a-pod-that-gets-scheduled-to-your-chosen-node
+  # @section -- Frontend
+  nodeSelector: {}
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  # @section -- Frontend
+  tolerations: []
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+  # @section -- Frontend
+  topologySpreadConstraints: []
+
+authcontroller:
+  # -- Flag to enable UM AuthController.
+  # @section -- Auth-Controller
+  enabled: true
+  modeF5:
+    # -- Flag to enable F5 mode in auth-controller, which allows to adapt to F5 upstream name (X-API-URL case)
+    # @section -- Auth-Controller
+    enabled: false
+  serviceAccount:
+    # -- Controls whether a ServiceAccount should be created
+    # @section -- Auth-Controller
+    create: true
+    # -- ServiceAccount name (if empty, uses a default name)
+    # @section -- Auth-Controller
+    name: ''
+    # -- Annotations to add to the ServiceAccount
+    # @section -- Auth-Controller
+    annotations: {}
+    # -- Controls whether credentials are automatically mounted
+    # @section -- Auth-Controller
+    automount: true
+  # -- Whether the auth-controller should watch all annotated namespaces or only the one where it is deployed
+  # @section -- Auth-Controller
+  clusterScoped: true
+  role:
+    # -- Flag to enable the creation of a Role/RoleBinding for the auth-controller.
+    # @section -- Auth-Controller
+    create: false
+    # -- Role name (if empty, uses a default name)
+    # @section -- Auth-Controller
+    name: ''
+    # -- Basic Role rules
+    # @section -- Auth-Controller
+    basicRules:
+    - apiGroups: ['']
+      resources: [configmaps]
+      verbs: [get, watch, list, patch]
+    - apiGroups: ['']
+      resources: [services]
+      verbs: [get]
+    - apiGroups: ['']
+      resources: [events]
+      verbs: [create, patch]
+    - apiGroups: [networking.k8s.io]
+      resources: [ingresses]
+      verbs: [get, watch, list, patch]
+    # -- Additional rules
+    # @section -- Auth-Controller
+    additionalRules: []
+  clusterRole:
+    # -- Flag to enable the creation of a ClusterRole/ClusterRoleBinding for the auth-controller.
+    # @section -- Auth-Controller
+    create: true
+    # -- ClusterRole name (if empty, uses a default name)
+    # @section -- Auth-Controller
+    name: ''
+    # -- Basic ClusterRole rules
+    # @section -- Auth-Controller
+    basicRules:
+    - apiGroups: ['']
+      resources: [configmaps]
+      verbs: [get, watch, list, patch]
+    - apiGroups: ['']
+      resources: [services]
+      verbs: [get]
+    - apiGroups: ['']
+      resources: [events]
+      verbs: [create, patch]
+    - apiGroups: [networking.k8s.io]
+      resources: [ingresses]
+      verbs: [get, watch, list, patch]
+    - apiGroups: ['']
+      resources: [namespaces]
+      verbs: [get, list, watch]
+    # -- Additional rules
+    # @section -- Auth-Controller
+    additionalRules: []
+  image:
+    # -- Repository to fetch the auth-controller image from
+    # @section -- Auth-Controller
+    repository: user-management/auth-controller
+    # -- Tag of the auth-controller image to fetch
+    # @section -- Auth-Controller
+    tag: 14.13.2
+  # @ignored DO NOT EDIT
+  fullnameOverride:
+  # -- Level of the logging
+  # @section -- Auth-Controller
+  logLevel: INFO
+  # -- Label selector to filter the namespaces to be watched by the auth-controller
+  # @section -- Auth-Controller
+  labelSelectorNamespace: ''
+  # -- Label selector(s) to filter the config maps to be watched, separated by commas if several
+  # @section -- Auth-Controller
+  labelSelectorConfigmap: ateme.com/user-management=configuration
+  # -- Label selector(s) to filter the ingresses to be watched, separated by commas if several
+  # @section -- Auth-Controller
+  labelSelectorIngress: ateme.com/user-management=configuration
+  # -- Controller Ingress Class Value
+  # @section -- Auth-Controller
+  controllerIngressClass: ''
+  # -- Maximum delay for the ingress reconciler exponential backoff rate limiter (in duration format, e.g., 30s, 1m)
+  # @section -- Auth-Controller
+  rateLimiterMaxDelay: 30s
+  # -- Additional arguments to be passed to the auth-controller
+  # @section -- Auth-Controller
+  additionalArgs: []
+  # -- Maximum delay (in seconds) before aborting tries to post authData
+  # @section -- Auth-Controller
+  postAuthDataTimeout: 240
+  # -- Pod security context (an `enabled` field is required), see https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # @section -- Auth-Controller
+  podSecurityContext:
+    enabled: true
+    fsGroup: 3000
+    seccompProfile:
+      type: RuntimeDefault
+  # -- Container security context (an `enabled` field is required), see https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  # @section -- Auth-Controller
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 2000
+    runAsGroup: 2000
+    runAsNonRoot: true
+    privileged: false
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+  # -- See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  # @section -- Auth-Controller
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  # -- Labels to add to the UM auth-controller pod
+  # @section -- Auth-Controller
+  podLabels: {}
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  # @section -- Auth-Controller
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+  # -- See https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes/#create-a-pod-that-gets-scheduled-to-your-chosen-node
+  # @section -- Auth-Controller
+  nodeSelector: {}
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  # @section -- Auth-Controller
+  tolerations: []
+  # -- See https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+  # @section -- Auth-Controller
+  topologySpreadConstraints: []
+  ## Configure extra options for authcontroller container' liveness
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  livenessProbe:
+    # -- Enable livenessProbe
+    # @section -- Auth-Controller
+    enabled: true
+    tcpSocket:
+      # -- Port of the tcpSocket livenessProbe
+      # @section -- Auth-Controller
+      port: 9440
+    # -- Initial delay seconds for livenessProbe
+    # @section -- Auth-Controller
+    initialDelaySeconds: 10
+    # -- Period seconds for livenessProbe
+    # @section -- Auth-Controller
+    periodSeconds: 10
+    # -- Timeout seconds for livenessProbe
+    # @section -- Auth-Controller
+    timeoutSeconds: 5
+    # -- Failure threshold for livenessProbe
+    # @section -- Auth-Controller
+    failureThreshold: 10
+    # -- Success threshold for livenessProbe
+    # @section -- Auth-Controller
+    successThreshold: 1
+
+database:
+  # -- Database url used by the backend
+  # @section -- Database
+  url: mongodb+srv://{{ .Release.Name }}-mongodb-headless.{{ .Release.Namespace }}.svc.cluster.local/?ssl=false
+  certificate:
+    # -- Flag to enable database certificate
+    # @section -- Database
+    enabled: false
+    # -- Flag to enable the creation of the certificate secret
+    # @section -- Database
+    createSecret: true
+    # -- Name of the secret holding certificates
+    # @section -- Database
+    secretName: mongo-tls-secret
+    # -- Database certificate data for connection (mandatory if `certificate.enabled` and `certificate.createSecret`)
+    # @section -- Database
+    data: ''
+    # -- Name of certificate file
+    # @section -- Database
+    name: cert.pem

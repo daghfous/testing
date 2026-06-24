@@ -1,0 +1,107 @@
+openapi: "3.0.0"
+info: 
+  title: "Test API"
+  version: "1.0.0"
+  x-auth: 
+    prefix: usr
+    label: Users
+    scope_descriptions:
+      administrator: Role granting full access to all users, roles, and identity management functionalities.
+      engineer: Role allowing configuration-related actions with additional permissions on users, roles, and identity management functionalities.
+      guest: Role with minimal access, limited to viewing personal information, logging out, and changing the password.
+paths:
+  /ping:
+    get:
+      operationId: get_ping
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Ping server
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+  /test:
+    get:
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+  /protected:
+    get:
+      operationId: get_protected
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+      x-scopes: []
+  /definition:
+    $ref: '#__auto_definition'
+  /documentation:
+    $ref: '#__auto_doc'
+  /internal_users_test:
+    get:
+      operationId: get_internal_users_test
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: "Get Internal users test"
+      tags: [test]
+      x-scopes: ["internal_administrator"]
+  /without_description:
+    get:
+      operationId: get_without_description
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      summary: "Get Blop without description"
+      tags: [test]
+      x-scopes: ["administrator"]
+  /without_description_and_summary:
+    get:
+      operationId: get_without_description_and_summary
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      tags: [test]
+      x-scopes: ["administrator"]
+  /V1.0/test-users/{user.id}:
+    get:
+      description: Get a user by id with version prefix without operationId
+      x-scopes: ["administrator"]
+      responses:
+        '200':
+          description: OK
+
+components:
+  responses:
+    default_200_responses:
+      description: "So far, so good."
+      content:
+        text/plain:
+          schema:
+            type: string
+  schemas:
+    testResponse:
+      type: string

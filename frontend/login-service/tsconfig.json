@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "jsx": "preserve",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*"],
+      "config/*": ["./config/*"],
+      "@/*": ["./src/*"]
+    },
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "sourceMap": true,
+    "strict": true,
+    "lib": ["ESNext", "DOM"],
+    "resolveJsonModule": true,
+    "declaration": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "maxNodeModuleJsDepth": 0
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "src/**/*.svg"], //"tests/**/*.ts"
+  "exclude": ["node_modules"]
+}

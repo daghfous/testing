@@ -1,0 +1,40 @@
+[
+    {
+        "id": "technical:import_export_user",
+        "label": "Global Role",
+        "description": "Scope for all-access users on configurations import / export or backup / restore",
+        "content": [
+            {
+                "action": "*:import_full_configuration",
+                "policy": "allow",
+                "resource": {}
+            },
+            {
+                "action": "*:export_full_configuration",
+                "policy": "allow",
+                "resource": {}
+            },
+            {
+                "action": "cle-supervision:pma:view_root_settings",
+                "policy": "allow",
+                "resource": {}
+            },
+            {
+                "action": "cle-supervision:pma:view_settings_general_tab",
+                "policy": "allow",
+                "resource": {}
+            },
+            {
+                "action": "cle-supervision:pma:view_settings_general_backup",
+                "policy": "allow",
+                "resource": {}
+            },
+            {
+                "action": "cle-supervision:pma:edit_settings_general_backup",
+                "policy": "allow",
+                "resource": {}
+            }
+        ],
+        "internal": true
+    }
+]

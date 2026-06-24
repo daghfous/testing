@@ -1,0 +1,1810 @@
+openapi: 3.0.4
+info:
+  title: E2E Channels V1 API
+  description: The current schema defines the ATEME Pilot Manager End-To-End Channels v1 API
+  x-auth:
+    prefix: e2e
+    label: End-to-end channels
+    scope_descriptions:
+      monitoring: Scope for view-only users on end-to-end channel functions
+      operator: Scope for control-enabled users on end-to-end channel functions
+      engineer: Scope for configuration-enabled users on end-to-end channel functions
+      administrator: Scope for all-access users on end-to-end channel functions
+
+  version: 1.0.0
+  x-logo:
+    altText: E2E Channels
+    url: "AtemeLogo.svg"
+
+paths:
+
+  /v1/version:
+    get:
+      operationId: GetVersion
+      summary: Get versions
+      description: |
+        This endpoint will return current Pilot Manager and component version.
+      tags:
+        - utils
+      responses:
+        '200':
+          description: Pilot Manager & component versions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/definition:
+    get:
+      operationId: GetDefinition
+      summary: Get definition
+      description: |
+        Retrieve OpenAPI definition in json format.
+      tags:
+        - utils
+      responses:
+        '200':
+          description: OpenAPI definition as json.
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/healthz/liveness:
+    get:
+      operationId: GetLiveness
+      summary: Get Liveness
+      description: |
+        Liveness endpoint, verifies that the service is alive.
+        Check that HTTP server is up & running. This operation doesn't verify that connection to MongoDB server is OK.
+      tags:
+        - probes
+      responses:
+        '200':
+          description: Service is OK.
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/healthz/readiness:
+    get:
+      operationId: GetReadiness
+      summary: Get Readiness
+      description: |
+        Readiness endpoint, verifies that the service is ready to handle HTTP traffic.
+        Check that connection to MongoDB server is OK and there is a writable primary on replicaset configuration.
+        Else HTTP server will send a 503 Service unavailable.
+      tags:
+        - probes
+      responses:
+        '200':
+          description: Service is ready.
+        '503':
+          description: Service is not ready.
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/backup:
+    get:
+      operationId: GetBackupData
+      summary: Get backup data
+      description: |
+        Backup endpoint. Returns the database data to be backed up for later restoration.
+      tags:
+        - Upgrade
+      x-scopes: ["engineer", "administrator"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupData'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/restore:
+    post:
+      operationId: RestoreData
+      summary: Restore data
+      description: |
+        Restore endpoint. Restore backed up data from previous call to the `/v1/backup` endpoint.
+      tags:
+        - Upgrade
+      x-scopes: ["engineer", "administrator"]
+      requestBody:
+        description: Backed up data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupData'
+      responses:
+        '200':
+          description: OK - Restored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restoredCount:
+                    type: integer
+                    description: Number of restored items
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/reset:
+    post:
+      operationId: ResetData
+      summary: Reset data
+      description: |
+        Reset endpoint.
+        Clean data from database. To be used before `/v1/restore` endpoint is called.
+      tags:
+        - Upgrade
+      x-scopes: ["engineer", "administrator"]
+      responses:
+        '204':
+          description: OK
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/e2e-channels:
+    get:
+      operationId: getE2EChannels
+      summary: Get all E2E channels
+      description: |
+        Return the list of all registered E2E Channels.
+      tags:
+        - E2E Channel
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Sort"
+        - in: query
+          name: search
+          description: Search E2E channels by name.
+          schema:
+            type: string
+        - in: query
+          name: severity
+          description: Filter E2E channels by severity.
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+            example: 200&severity=300
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+              description: Total number of E2E channels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/E2EChannel'
+                x-go-type-skip-optional-pointer: true
+        '400':
+          description: Bad Request - Invalid pagination or sorting parameters
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: createE2EChannel
+      summary: Create an E2E channel
+      description: |
+        Save the representation of an E2E Channel.
+      tags:
+        - E2E Channel
+      x-scopes: ["engineer", "administrator"]
+      requestBody:
+        description: E2E Channel definition
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/E2EChannel'
+      responses:
+        '201':
+          description: OK - Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/E2EChannel'
+        '409':
+          description: Conflict - An E2E Channel with this name already exists
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/e2e-channels/summary:
+    get:
+      operationId: getE2EChannelsSummary
+      summary: Get E2E channels summary
+      description: |
+        Return details about the health of E2E channels.
+      tags:
+        - E2E Channel
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/E2EChannelsSummary'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/e2e-channels/names:
+    get:
+      operationId: getE2EChannelsNames
+      summary: Get E2E channels names
+      description: |
+        Return the list of names of registered E2E Channels.
+      tags:
+        - E2E Channel
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/e2e-channel/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getE2EChannel
+      summary: Get E2E channel
+      description: |
+        Retrieve an E2E channel by its id.
+      tags:
+        - E2E Channel
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/E2EChannel'
+        '404':
+          description: E2E Channel Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      operationId: updateE2EChannel
+      summary: Update E2E channel
+      description: |
+        Update an E2E channel by its id.
+      tags:
+        - E2E Channel
+      x-scopes: ["engineer", "administrator"]
+      requestBody:
+        description: E2E Channel definition
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/E2EChannel'
+      responses:
+        '200':
+          description: OK - Updated
+        '404':
+          description: E2E Channel Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict - An E2E Channel with this name already exists
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: deleteE2EChannel
+      summary: Delete E2E channel
+      description: |
+        Delete an E2E channel by its id.
+      tags:
+        - E2E Channel
+      x-scopes: ["engineer", "administrator"]
+      responses:
+        '204':
+          description: E2E Channel deleted successfully
+        '404':
+          description: E2E Channel Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/e2e-channel/{id}/logo:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getE2EChannelLogo
+      summary: Get logo
+      description: |
+        Retrieve a logo by E2E channel id.
+      tags:
+        - E2E Channel
+      responses:
+        '200':
+          description: Logo content
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: E2E Channel Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      operationId: addE2EChannelLogo
+      summary: Add logo
+      description: |
+        Add a logo to an E2E channel.
+      tags:
+        - E2E Channel
+      x-scopes: ["engineer", "administrator"]
+      parameters:
+      - name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+        example: 'image/png'
+      - name: Content-Disposition
+        in: header
+        required: true
+        schema:
+          type: string
+        example: 'inline; filename="logo.png"'
+      requestBody:
+        description: "Logo content (max size: 500 KB)"
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+              maxLength: 512000
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+              maxLength: 512000
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+              maxLength: 512000
+      responses:
+        '201':
+          description: OK
+        '400':
+          description: |
+            Bad Request - Invalid file, file too large, invalid Content-Type header or missing filename in 'Content-Disposition' header
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: E2E Channel Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict - A logo already exists for this E2E Channel
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      operationId: updateE2EChannelLogo
+      summary: Change logo
+      description: |
+        Change logo of an E2E channel.
+      tags:
+        - E2E Channel
+      x-scopes: ["engineer", "administrator"]
+      parameters:
+      - name: Content-Type
+        in: header
+        required: true
+        schema:
+          type: string
+        example: 'image/png'
+      - name: Content-Disposition
+        in: header
+        required: true
+        schema:
+          type: string
+        example: 'inline; filename="logo.png"'
+      requestBody:
+        description: "Logo content (max size: 500 KB)"
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+              maxLength: 512000
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+              maxLength: 512000
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+              maxLength: 512000
+      responses:
+        '204':
+          description: OK
+        '400':
+          description: |
+            Bad Request - Invalid file, file too large, invalid Content-Type header or missing filename in 'Content-Disposition' header
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: E2E Channel Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: deleteE2EChannelLogo
+      summary: Delete logo
+      description: |
+        Delete logo of an E2E channel.
+      tags:
+        - E2E Channel
+      x-scopes: ["engineer", "administrator"]
+      responses:
+        '204':
+          description: OK
+        '404':
+          description: E2E Channel or Logo Not Found
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/e2e-channel/{id}/graph:
+    get:
+      operationId: getGraphByE2EChannelId
+      summary: Get E2E channel graph
+      description: |
+        Compute the E2E Graph related to an E2E Channel.
+      tags:
+        - E2E Channel
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/E2EGraph'
+        '404':
+          description: Not Found
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/graph:
+    get:
+      operationId: getGraph
+      summary: Get Graph
+      description: |
+        Compute an E2E Graph by filters.
+      tags:
+        - Graph
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      parameters:
+        - name: inputs
+          in: query
+          description: |
+            Labels of the inputs from which the Graph must start
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: TS 192.168.1.1:1234&inputs=TS 192.168.1.2:1234
+        - name: outputs
+          in: query
+          description: |
+            Labels of the outputs where the Graph must end
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+            example: TS 192.168.2.1:1234&outputs=TS 192.168.2.2:1234
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/E2EGraph'
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/channels/inputs-outputs:
+    get:
+      operationId: getChannelsInputsOutputs
+      summary: Get inputs and outputs
+      description: |
+        Retrieve the labels that identifies the inputs and outputs of the channels
+      tags:
+        - Inputs & Outputs
+      x-scopes: ["monitoring", "operator", "engineer", "administrator"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inputs:
+                    title: Inputs
+                    type: array
+                    items:
+                      type: string
+                    x-go-type-skip-optional-pointer: true
+                  outputs:
+                    title: Outputs
+                    type: array
+                    items:
+                      type: string
+                    x-go-type-skip-optional-pointer: true
+        default:
+          description: An error occurred
+          content:
+            plain/text:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+
+    Limit:
+      in: query
+      name: limit
+      description: Number of elements to return
+      schema:
+        type: integer
+        minimum: 1
+
+    Page:
+      in: query
+      name: page
+      description: Page to return. Works only if `limit` is specified
+      schema:
+        type: integer
+        minimum: 1
+
+    Sort:
+      in: query
+      name: sort
+      description: |
+        Sorting to apply.
+        Values must contain the field name and the sort direction in the format:
+        - `field,asc` for ascending order
+        - `field,desc` for descending order
+      schema:
+        type: array
+        items:
+          type: string
+        example: highestAlarmStatus.severity,desc&sort=name,asc
+
+  schemas:
+
+    Version:
+      type: object
+      properties:
+        apiVersion:
+          type: string
+          example: "1.0.0"
+          description: Latest available version of the API
+          x-go-type-skip-optional-pointer: true
+        componentVersion:
+          type: string
+          example: "1.1.0"
+          description: Current running version of Pilot Manager
+          x-go-type-skip-optional-pointer: true
+
+    E2EChannel:
+      title: E2E Channel
+      description: |
+        Definition of an E2E Channel.
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          title: E2E Channel ID
+          type: string
+          readOnly: true
+          x-go-type-skip-optional-pointer: true
+        name:
+          title: E2E Channel Name
+          type: string
+          x-go-type-skip-optional-pointer: true
+        creationDate:
+          title: Creation date of the E2E channel
+          type: string
+          format: datetime
+          readOnly: true
+          x-go-type-skip-optional-pointer: true
+        logo:
+          $ref: '#/components/schemas/E2EChannelLogo'
+        inputs:
+          title: E2E Channel Input label list
+          type: array
+          items:
+            type: string
+          x-go-type-skip-optional-pointer: true
+        outputs:
+          title: E2E Channel Output label list
+          type: array
+          items:
+            type: string
+          x-go-type-skip-optional-pointer: true
+        health:
+          $ref: '#/components/schemas/E2EChannelHealth'
+
+    E2EChannelLogo:
+      title: E2E Channel logo
+      description: |
+        Metadata of an E2E Channel logo.
+      type: object
+      properties:
+        filename:
+            title: Logo filename
+            description: Name of the logo file
+            type: string
+            readOnly: true
+            x-go-type-skip-optional-pointer: true
+        lastUpdateDate:
+            title: Logo last update date
+            description: Last update date of the logo file
+            type: string
+            format: datetime
+            readOnly: true
+            x-go-type-skip-optional-pointer: true
+
+    E2EChannelHealth:
+      title: E2E Channel health data
+      type: object
+      readOnly: true
+      properties:
+        highestAlarmStatus:
+          $ref: '#/components/schemas/AlarmStatus'
+        activeInputRedundancy:
+          title: Active input redundancy
+          description: Number of active backup inputs
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        activeInstanceRedundancy:
+          title: Active instance redundancy
+          description: Number of active backup instance
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        status:
+          title: Status
+          description: Synthesis running status of the end to end channel
+          type: string
+          enum:
+            - Running
+            - Not running
+            - Transitory
+            - Error
+          x-go-type-skip-optional-pointer: true
+
+    E2EGraph:
+      title: E2E Graph
+      description: |
+        A Graph representation of an E2E Channel
+      type: object
+      required:
+        - channels
+        - relationships
+      properties:
+        channels:
+          title: List of channels composing the E2E Channel
+          type: array
+          items:
+            $ref: '#/components/schemas/Channel'
+          x-go-type-skip-optional-pointer: true
+        relationships:
+          title: Relationships between the channels
+          type: array
+          items:
+            $ref: '#/components/schemas/Relationship'
+          x-go-type-skip-optional-pointer: true
+
+    Relationship:
+      title: Relationship between two channels
+      type: object
+      properties:
+        source:
+          title: ID of the source channel
+          type: string
+          x-go-type-skip-optional-pointer: true
+        destination:
+          title: ID of the destination channel
+          type: string
+          x-go-type-skip-optional-pointer: true
+
+    Channel:
+      title: Channel
+      type: object
+      required:
+        - inputs
+        - outputs
+      properties:
+        id:
+          title: Channel UID
+          description: |
+            Unique Identifiant of the channel
+          type: string
+          x-go-type-skip-optional-pointer: true
+        pmsId:
+          title: PMS Channel UID
+          description: |
+            Unique Identifiant of the channel in PMS
+          type: string
+          x-go-type-skip-optional-pointer: true
+        type:
+          title: Channel type
+          type: string
+          enum:
+            - Encoder
+            - Multiplexer
+          x-go-type-skip-optional-pointer: true
+        name:
+          title: Channel name
+          type: string
+          example: France 3
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL of the channel
+          type: string
+          x-go-type-skip-optional-pointer: true
+        status:
+          title: Channel status retrieved from products
+          type: string
+          x-go-type-skip-optional-pointer: true
+        inputs:
+          title: Channel input list
+          type: array
+          items:
+            $ref: '#/components/schemas/Input'
+          x-go-type-skip-optional-pointer: true
+        outputs:
+          title: Channel output list
+          type: array
+          items:
+            $ref: '#/components/schemas/Output'
+          x-go-type-skip-optional-pointer: true
+        instance:
+          $ref: '#/components/schemas/Instance'
+        redundancyGroup:
+          $ref: '#/components/schemas/RedundancyGroup'
+        highestAlarmStatus:
+          $ref: '#/components/schemas/AlarmStatus'
+
+    Input:
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          description: |
+            PMS label, product label or no label
+          type: string
+          example: Direct-Fr3-4K
+          x-go-type-skip-optional-pointer: true
+        hlsInput:
+          $ref: '#/components/schemas/HLSInput'
+        ipInputs:
+          title: List of IP inputs
+          type: array
+          items:
+            $ref: '#/components/schemas/IPInput'
+          x-go-type-skip-optional-pointer: true
+        rtmpInput:
+          $ref: '#/components/schemas/RTMPInput'
+        sdi4KInputs:
+          title: List of SDI 4K inputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SDIInput'
+          x-go-type-skip-optional-pointer: true
+        sdiInput:
+          $ref: '#/components/schemas/SDIInput'
+        smpte20226Inputs:
+          title: List of SMPTE 2022-6 inputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SMPTE20226Input'
+          x-go-type-skip-optional-pointer: true
+        smpte2110Inputs:
+          title: List of SMPTE 2110 inputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SMPTE2110Input'
+          x-go-type-skip-optional-pointer: true
+        srtInputs:
+          title: List of SRT inputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SRTInput'
+          x-go-type-skip-optional-pointer: true
+        zixiInputs:
+          title: List of ZIXI inputs
+          type: array
+          items:
+            $ref: '#/components/schemas/ZIXIInput'
+          x-go-type-skip-optional-pointer: true
+
+    HLSInput:
+      title: HLS Input
+      description: |
+        HLS type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: Address of the stream
+          type: string
+          example: http://host/location
+          x-go-type-skip-optional-pointer: true
+
+    IPInput:
+      title: IP Input
+      description: |
+        IP type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: IP address of the stream
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        sourceFiltering:
+          title: Source filter to apply
+          type: array
+          items:
+            type: string
+          example: ["0.0.0.0"]
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+
+    RTMPInput:
+      title: RTMP Input
+      description: |
+        RTMP type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        mode:
+          title: RTMP mode
+          type: string
+          example: Server
+          x-go-type-skip-optional-pointer: true
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        port:
+          title: Port of the stream
+          type: integer
+          example: 12345
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: Address of the stream
+          type: string
+          example: rtmp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+
+    SDI4KInput:
+      title: SDI 4K Input
+      description: |
+        SDI 4K type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: udp
+          x-go-type-skip-optional-pointer: true
+        inputNumber:
+          title: SDI Input Number
+          type: integer
+          x-go-type-skip-optional-pointer: true
+
+    SDIInput:
+      title: SDI Input
+      description: |
+        SDI type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: udp
+          x-go-type-skip-optional-pointer: true
+        inputNumber:
+          title: SDI Input Number
+          type: integer
+          x-go-type-skip-optional-pointer: true
+
+    SMPTE20226Input:
+      title: SMPTE 2022-6 Input
+      description: |
+        SMPTE 2022-6 type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: udp
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: IP address of the stream
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        active:
+          $ref: '#/components/schemas/Active'
+
+    SMPTE2110Input:
+      title: SMPTE 2110 Input
+      description: |
+        SMPTE 2110 type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens161
+          x-go-type-skip-optional-pointer: true
+        redundancy:
+          title: Redundancy of the interface
+          type: string
+          example: 'SMPTE 2022-7'
+          x-go-type-skip-optional-pointer: true
+
+    SRTInput:
+      title: SRT Input
+      description: |
+        SRT type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: IP address of the stream
+          type: string
+          example: srt://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        port:
+          title: Port of the stream
+          type: integer
+          example: 12345
+          x-go-type-skip-optional-pointer: true
+        active:
+          $ref: '#/components/schemas/Active'
+
+    ZIXIInput:
+      title: ZIXI Input
+      description: |
+        ZIXI type Input
+      type: object
+      properties:
+        label:
+          title: Label of the input
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: IP address of the stream
+          type: string
+          example: srt://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        port:
+          title: Port of the stream
+          type: integer
+          example: 12345
+          x-go-type-skip-optional-pointer: true
+        active:
+          $ref: '#/components/schemas/Active'
+
+    Output:
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          description: |
+            PMS label, product label or no label
+          type: string
+          example: Direct-Fr3-4K
+          x-go-type-skip-optional-pointer: true
+        asiOutputs:
+          title: List of ASI outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/ASIOutput'
+          x-go-type-skip-optional-pointer: true
+        cmafOutputs:
+          title: List of CMAF outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/CMAFOutput'
+          x-go-type-skip-optional-pointer: true
+        dashOutputs:
+          title: List of DASH outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/DashOutput'
+          x-go-type-skip-optional-pointer: true
+        fmp4Outputs:
+          title: List of FMP4 outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/FMP4Output'
+          x-go-type-skip-optional-pointer: true
+        hlsOutputs:
+          title: List of HLS outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/HLSOutput'
+          x-go-type-skip-optional-pointer: true
+        ipOutputs:
+          title: List of IP outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/IPOutput'
+          x-go-type-skip-optional-pointer: true
+        rtmpOutputs:
+          title: List of RTMP outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/RTMPOutput'
+          x-go-type-skip-optional-pointer: true
+        smpte20226Outputs:
+          title: List of SMPTE 2022-6 outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SMPTE20226Output'
+          x-go-type-skip-optional-pointer: true
+        smpte2110Outputs:
+          title: List of SMPTE 2110 outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SMPTE2110Output'
+          x-go-type-skip-optional-pointer: true
+        srtOutputs:
+          title: List of SRT outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/SRTOutput'
+          x-go-type-skip-optional-pointer: true
+        zixiOutputs:
+          title: List of ZIXI outputs
+          type: array
+          items:
+            $ref: '#/components/schemas/ZixiOutput'
+          x-go-type-skip-optional-pointer: true
+
+    ASIOutput:
+      title: ASI Output
+      description: |
+        ASI type Output
+      type: object
+      properties:
+        label:
+          title: label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        enabled:
+          title: State of the output
+          type: boolean
+          nullable: true
+          x-go-type-skip-optional-pointer: true
+        logicalName:
+          title: Logical name of the asi output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        serviceOutputId:
+          title: Id of the output
+          type: integer
+          x-go-type-skip-optional-pointer: true
+
+    CMAFOutput:
+      title: CMAF Output
+      description: |
+        CMAF type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+
+    DashOutput:
+      title: Dash Output
+      description: |
+        Dash type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+
+    FMP4Output:
+      title: FMP4 Output
+      description: |
+        FMP4 type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+
+    HLSOutput:
+      title: HLS Output
+      description: |
+        HLS type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+
+    IPOutput:
+      title: IP Output
+      description: |
+        IP type Output
+      type: object
+      properties:
+        label:
+          title: label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+
+    RTMPOutput:
+      title: RTMP Output
+      description: |
+        RTMP type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        port:
+          title: Port of the stream
+          type: integer
+          example: 12345
+          x-go-type-skip-optional-pointer: true
+
+    SMPTE20226Output:
+      title: SMPTE 2022-6 Output
+      description: |
+        SMPTE 2022-6 type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        active:
+          $ref: '#/components/schemas/Active'
+
+    SMPTE2110Output:
+      title: SMPTE 2110 Output
+      description: |
+        SMPTE 2110 type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        active:
+          $ref: '#/components/schemas/Active'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        redundancy:
+          title: Redundancy of the interface
+          type: string
+          x-go-type-skip-optional-pointer: true
+
+    SRTOutput:
+      title: SRT Output
+      description: |
+        SRT type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL to use
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        port:
+          title: Port of the stream
+          type: integer
+          example: 12345
+          x-go-type-skip-optional-pointer: true
+        active:
+          $ref: '#/components/schemas/Active'
+
+    ZixiOutput:
+      title: Zixi Output
+      description: |
+        Zixi type Output
+      type: object
+      properties:
+        label:
+          title: Label of the output
+          type: string
+          x-go-type-skip-optional-pointer: true
+        role:
+          $ref: '#/components/schemas/Role'
+        interface:
+          title: Name of the interface
+          type: string
+          example: ens160
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: URL of the stream
+          type: string
+          example: udp://10.53.147.1:27175
+          x-go-type-skip-optional-pointer: true
+        port:
+          title: Port of the stream
+          type: integer
+          example: 12345
+          x-go-type-skip-optional-pointer: true
+        active:
+          $ref: '#/components/schemas/Active'
+
+    Instance:
+      title: Instance supporting the channel
+      type: object
+      properties:
+        id:
+          title: Instance ID
+          description: |
+            Unique Identifiant of the instance or device
+          type: string
+          x-go-type-skip-optional-pointer: true
+        name:
+          title: Name of the instance
+          type: string
+          example: TitanLive1
+          x-go-type-skip-optional-pointer: true
+        url:
+          title: Administration URL of the instance
+          type: string
+          example: https://16.3.184.51:8080/
+          x-go-type-skip-optional-pointer: true
+        provider:
+          title: Instance provider
+          type: string
+          enum:
+            - Ateme
+            - Other
+          x-go-type-skip-optional-pointer: true
+        type:
+          title: Instance type
+          type: string
+          enum:
+            - TL
+            - TITAN Mux
+          x-go-type-skip-optional-pointer: true
+        role:
+          title: Instance role
+          type: string
+          enum:
+            - primary
+            - backup
+          x-go-type-skip-optional-pointer: true
+        highestAlarmStatus:
+          $ref: '#/components/schemas/AlarmStatus'
+
+    RedundancyGroup:
+      title: Redundancy group
+      type: object
+      properties:
+        id:
+          title: Redundancy group ID
+          type: string
+          x-go-type-skip-optional-pointer: true
+        name:
+          title: Redundancy group name
+          type: string
+          x-go-type-skip-optional-pointer: true
+        instances:
+          title: List of instances that belongs to the redundancy group
+          description: |
+            If the instance type is "primary", this list will contain all available backup instances.
+            If the instance type is "backup" (meaning the redundancy has been activated),
+            this list will contain the primary instance.
+          type: array
+          items:
+            $ref: '#/components/schemas/Instance'
+          x-go-type-skip-optional-pointer: true
+
+    AlarmStatus:
+      title: Alarm status
+      type: object
+      required:
+        - severity
+      properties:
+        severity:
+          title: Severity
+          description: |
+            Severity of opened alarm
+          type: integer
+          x-go-type-skip-optional-pointer: true
+        count:
+          title: Count
+          description: |
+            Count of alarms with this severity
+          type: integer
+          x-go-type-skip-optional-pointer: true
+
+    Role:
+      title: Role of the IO
+      type: string
+      enum:
+        - noFailover
+        - main
+        - backup
+      x-go-type-skip-optional-pointer: true
+
+    Active:
+      title: Active status
+      description: |
+        Whether the IO is active
+      type: boolean
+      nullable: true
+      x-go-type-skip-optional-pointer: true
+
+    BackupData:
+      title: Backup Data
+      description: |
+        Data to be saved or restored.
+      type: object
+      required:
+        - version
+        - data
+      properties:
+        version:
+          title: Version
+          description: Version of the backed up data
+          type: string
+        data:
+          type: object
+          description: Content to be saved or restored
+          required:
+            - e2e-channels
+            - e2e-channels-logo
+          properties:
+            e2e-channels:
+              title: E2E Channel collection
+              description: Content of the `e2e-channels` collection
+              type: array
+              items:
+                type: object
+              x-go-type-skip-optional-pointer: true
+            e2e-channels-logo:
+              title: E2E Channel logo collection
+              description: Content of the `e2e-channels-logo` collection
+              type: array
+              items:
+                type: object
+              x-go-type-skip-optional-pointer: true
+
+    E2EChannelsSummary:
+      title: E2E channels summary
+      description: |
+        Monitoring details about the health of E2E channels.
+      type: object
+      readOnly: true
+      required:
+        - totalCount
+        - withAlarms
+        - withRedundancy
+        - status
+      properties:
+        totalCount:
+          title: Total count
+          description: Total count of E2E channels.
+          type: integer
+          minimum: 0
+        withAlarms:
+          title: With alarms
+          description: Names of E2E channels with open alarms.
+          type: array
+          items:
+            type: string
+        withRedundancy:
+          title: With redundancy
+          description: Names of E2E channels with active redundancy.
+          type: array
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/E2EChannelsStatus'
+
+    E2EChannelsStatus:
+      title: E2E channels status
+      description: Names of E2E channels with the specified statuses.
+      type: object
+      readOnly: true
+      required:
+        - running
+        - notRunning
+        - transitory
+        - error
+      properties:
+        running:
+          title: Running
+          description: Name of E2E channels with the status 'Running'.
+          type: array
+          items:
+            type: string
+        notRunning:
+          title: Not running
+          description: Name of E2E channels with the status 'Not running'.
+          type: array
+          items:
+            type: string
+        transitory:
+          title: Transitory
+          description: Name of E2E channels with the status 'Transitory'.
+          type: array
+          items:
+            type: string
+        error:
+          title: Error
+          description: Name of E2E channels with the status 'Error'.
+          type: array
+          items:
+            type: string
+
+    Error:
+      title: Error message
+      type: string

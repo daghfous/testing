@@ -1,0 +1,8 @@
+title: Idp saml config structure.
+description: This data structure describes the saml_config format exposed by the API.
+allOf:
+  - $ref: './idp_saml_config.yaml'
+example:
+  idp_type: saml
+  idp_name: corp-saml
+  idp_label: Corporate SSO Updated

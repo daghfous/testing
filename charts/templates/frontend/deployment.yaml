@@ -1,0 +1,159 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "um.frontend.fullname" . }}
+  labels:
+    app: {{ template "um.frontend.fullname" . }}
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ template "um.frontend.replicas" . }}
+  strategy: {{- toYaml .Values.frontend.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      app: {{ template "um.frontend.fullname" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      {{- if .Values.frontend.envFromConfigMapName }}
+      {{- $cm := lookup "v1" "ConfigMap" .Release.Namespace .Values.frontend.envFromConfigMapName }}
+      {{- if $cm }}
+      annotations:
+        checksum/external-config: {{ $cm.data | toYaml | sha256sum }}
+      {{- end }}
+      {{- end }}
+      labels:
+        app: {{ template "um.frontend.fullname" . }}
+        release: {{ .Release.Name }}
+        mode: {{ .Values.global.app.configuration.mode }}
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.Version }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        {{- if $podLabels := .Values.frontend.podLabels }}
+        {{ include "tplvalues.render" (dict "value" $podLabels "context" $) | nindent 8 | trim }}
+        {{- end }}
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Always
+      {{- if .Values.global.registry.private }}
+      imagePullSecrets:
+        - name: {{ template "um.secrets.registrycredentials.name" . }}
+      {{- end }}
+      volumes:
+        - name: confd
+          configMap:
+            name: {{ template "um.frontend.fullname" . }}
+        - name: nginx-config-volume
+          configMap:
+            name: {{ template "um.frontend.fullname" . }}-nginx
+        - name: html
+          emptyDir: {}
+        - name: pid
+          emptyDir: {}
+      {{- if .Values.frontend.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.frontend.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.registry.address }}/{{ .Values.global.registry.folderName }}{{ not .Values.global.registry.folderName | ternary "" "/" }}{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          imagePullPolicy: {{ .Values.global.system.images.pullPolicy }}
+          {{- if .Values.frontend.containerSecurityContext.enabled }}
+          securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.frontend.containerSecurityContext "context" $) | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.frontend.containerPorts.http }}
+              protocol: TCP
+          {{- if .Values.frontend.customLivenessProbe }}
+          livenessProbe: {{- include "tplvalues.render" (dict "value" .Values.frontend.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.frontend.livenessProbe.enabled }}
+          livenessProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.frontend.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /healthz
+              port: http
+          {{- end }}
+          {{- if .Values.frontend.customReadinessProbe }}
+          readinessProbe: {{- include "tplvalues.render" (dict "value" .Values.frontend.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.frontend.readinessProbe.enabled }}
+          readinessProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.frontend.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /ready
+              port: http
+          {{- end }}
+          {{- if .Values.frontend.customStartupProbe }}
+          startupProbe: {{- include "tplvalues.render" (dict "value" .Values.frontend.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.frontend.startupProbe.enabled }}
+          startupProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.frontend.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: http
+          {{- end }}
+          volumeMounts:
+            - name: nginx-config-volume
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: confd
+              mountPath: /ateme/nginx/conf.d/
+            - name: html
+              mountPath: /ateme/nginx/html
+            - name: pid
+              mountPath: /ateme/nginx/pid
+          env:
+            - name: "USER_MGT_URL"
+              value: "/{{ .Release.Name }}/users/"
+            - name: "RELEASE_NAME"
+              value: "{{ .Release.Name }}"
+            - name: "DEPLOYING_WITH_PMF"
+              value: "{{ .Values.global.system.application.deployingWithPfs }}"
+            - name: "APP_VERSION"
+              value: "{{ .Chart.Version }}"
+            {{- if .Values.frontend.extraEnvVars }}
+            {{- include "tplvalues.render" (dict "value" .Values.frontend.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+            - name: ENTRYPOINT_DEBUG
+              {{- if .Values.frontend.debugEntrypoint }}
+              value: "{{ .Values.frontend.debugEntrypoint }}"
+              {{- else }}
+              value: "false"
+              {{- end }}
+          {{- if .Values.frontend.envFromConfigMapName }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.frontend.envFromConfigMapName  }}
+          {{- end }}
+          resources:
+{{ toYaml .Values.frontend.resources | indent 12 }}
+    {{- with .Values.frontend.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      affinity:
+      {{- if eq .Values.global.app.configuration.mode "HA" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - {{ template "um.frontend.fullname" . }}
+              topologyKey: "kubernetes.io/hostname"
+      {{- end }}
+      {{- with .Values.frontend.nodeAffinity }}
+        nodeAffinity:
+{{ toYaml . | indent 10 }}
+      {{- end }}
+    {{- with .Values.frontend.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- if .Values.frontend.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "tplvalues.render" (dict "value" .Values.frontend.topologySpreadConstraints "context" .) | nindent 8 }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,64 @@
+{{- if and .Values.ingress.enabled .Values.backend.enabled }}
+{{- $ingressPath := .Values.backend.ingress.auth.path -}}
+{{- $ingressPathType := .Values.backend.ingress.auth.pathType -}}
+{{- $extraPaths := .Values.backend.ingress.auth.extraPaths -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-umingress
+  annotations:
+    {{- with .Values.backend.ingress.auth.annotations }}
+      {{- range $key, $value := . }}
+      {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+    {{- end }}
+    {{- with .Values.backend.ingress.auth.additionalAnnotations }}
+      {{- range $key, $value := . }}
+      {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+    {{- end }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  ingressClassName: {{ tpl .Values.backend.ingress.auth.class . }}
+  {{- if $tls := .Values.backend.ingress.auth.tls }}
+  tls:
+{{ tpl (toYaml $tls) . | indent 4 }}
+  {{- end }}
+  rules:
+  - http:
+      paths:
+        {{- with $extraPaths }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        - path: {{ tpl $ingressPath . }}
+          pathType: {{ $ingressPathType }}
+          backend:
+            service:
+              name: {{ template "um.backend.fullname" . }}
+              port:
+                number: {{ .Values.backend.service.ports.http }}
+    {{- if .Values.backend.ingress.auth.hostname }}
+    host: {{ tpl .Values.backend.ingress.auth.hostname . | quote }}
+    {{- end }}
+  {{- range .Values.backend.ingress.auth.extraHosts }}
+  - host: {{ tpl .name $ | quote }}
+    http:
+      paths:
+        {{- with $extraPaths }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        - path: {{ tpl $ingressPath $ }}
+          pathType: {{ $ingressPathType }}
+          backend:
+            service:
+              name: {{ template "um.backend.fullname" $ }}
+              port:
+                number: {{ $.Values.backend.service.ports.http }}
+  {{- end }}
+{{- end }}

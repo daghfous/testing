@@ -1,0 +1,16 @@
+{
+  "title": "Failover synchronization schema for collection scopes of User Management for version latest",
+  "component": "user-management",
+  "collection": "scopes",
+  "version": "latest",
+  "import_policy": {
+    "conflict_management": "override",
+    "key_index": [
+      {"id": "ASCENDING"}
+    ]
+   },
+  "export_policy": {
+    "filters": { "$and": [{"internal": {"$ne": true}}, {"default": {"$ne": true}}]},
+    "fields": {"_id": 0}
+  }
+}

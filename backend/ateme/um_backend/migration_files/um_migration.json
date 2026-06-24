@@ -1,0 +1,37 @@
+{
+  "title": "Migration schema for User Management",
+  "component": "user-management",
+  "schema_version": "1.0",
+  "version_list": {
+    "4.0": {
+      "version_description": "Version 4.0",
+      "collections": {
+        "users": "4.0/um_users.json",
+        "ldap_config": "4.0/um_ldap_config.json",
+        "configuration": "4.0/um_configuration.json",
+        "scopes": "4.0/um_scopes.json",
+        "admin": "4.0/um_admin.json"
+      }
+    },
+    "5.0": {
+      "version_description": "Version 5.0",
+      "collections": {
+        "users": "5.0/um_users.json",
+        "idp_config": "5.0/um_idp_config.json",
+        "configuration": "5.0/um_configuration.json",
+        "scopes": "5.0/um_scopes.json",
+        "admin": "5.0/um_admin.json"
+      }
+    },
+    "9.0": {
+      "version_description": "Version 9.0",
+      "collections": {
+        "users": "9.0/um_users.json",
+        "idp_config": "9.0/um_idp_config.json",
+        "configuration": "9.0/um_configuration.json",
+        "scopes": "9.0/um_scopes.json",
+        "admin": "9.0/um_admin.json"
+      }
+    }
+  }
+}

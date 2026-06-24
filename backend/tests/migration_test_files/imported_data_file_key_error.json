@@ -1,0 +1,82 @@
+{
+    "hash": "f8e7bbe0b7ca7a324f28277cf91241b9",
+    "data": {
+        "5.0": [
+            {
+                "collection": "idp_config",
+                "import_policy": {
+                    "conflict_management": "override",
+                    "key_index": [{"idp_name": "ASCENDING"}]
+                },
+                "data": [
+                    {
+                        "server": "atm-extra.guest.corp.ateme.com",
+                        "search": "CN=Guest,DC=corp,DC=ateme,DC=com",
+                        "group": "S_GUEST"
+                    }
+                ]
+            },
+            {
+                "collection": "configuration",
+                "import_policy": {
+                    "conflict_management": "override",
+                    "key_index": []
+                },
+                "data": [
+                    {
+                        "log_activity": true,
+                        "password_expiration": -1,
+                        "max_successive_failed_login": 3,
+                        "user_deactivation_period": 800,
+                        "token_expiration": 13600,
+                        "refresh_token_expiration": 17200,
+                        "token_cleaning_period": 24
+                    }
+                ]
+            },
+            {
+                "collection": "users",
+                "import_policy": {
+                    "conflict_management": "abort",
+                    "key_index": [{"user_id": "ASCENDING"}, {"username": "ASCENDING"}]
+                },
+                "data": [
+                    {
+                        "creation_id": {
+                            "$oid": "63f8826a2b015ac6ae26ff1e"
+                        },
+                        "user_id": "fe97666064e76f0bb9d795168e2e99b5f37e1cc7",
+                        "username": "Jim",
+                        "password": "123456",
+                        "enabled": true,
+                        "password_last_update": false,
+                        "scopes": ["usr:engineer", "usr:unexist"],
+                        "authenticate_mode": "local",
+                        "first_login": false,
+                        "internal": false,
+                        "idp_name": "local"
+                    }
+                ]
+            }, {
+            "collection": "scopes",
+            "import_policy": {
+                "conflict_management": "abort",
+                "key_index": [{"id": "ASCENDING"}]
+            },
+            "data": [
+                {
+                    "id": "usr:actor",
+                    "label": "Actor",
+                    "version": 3,
+                    "content": [
+                        {"scope": "usr:engineer"},
+                        {"action": "get_current_user"},
+                        {"scope": "usr:unexist"},
+                        {"action": "unexist"}
+                    ],
+                    "title": "Actor actor"}
+            ]
+            }
+        ]
+    }
+}

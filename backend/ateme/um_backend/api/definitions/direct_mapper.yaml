@@ -1,0 +1,24 @@
+type: object
+title: IDP SAML direct mapper config structure
+description: This data structure describe the SAML IDP direct mapper data structure
+required:
+  - type
+  - attribute_name
+properties:
+  _id:
+    title: ID of the mapper
+    description: The unique identifier of the mapper
+    type: string
+  type:
+    title: Type of the mapper
+    description: The type of the mapper, which is "direct" for direct mappers
+    type: string
+    enum:
+      - direct
+  attribute_name:
+    type: string
+    title: Mapper attribute name
+    description: Attribute name that matches to apply the mapper
+example:
+  type: direct
+  attribute_name: groups

@@ -1,0 +1,4 @@
+type: string
+description: The prefix used to identify the module
+pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?:[a-z0-9]{3,10}$|^[a-z0-9]{3,10}$'
+example: "'ala' or 'app-name:ala'"

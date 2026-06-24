@@ -1,0 +1,23 @@
+type: object
+title: login struct
+description: This data structure describe the login data structure
+required:
+  - username
+  - password
+properties:
+  username:
+    title: Username of the user who try to log in
+    type: string
+  password:
+    type: string
+    title: user password
+  idp_name:
+    $ref: 'idp_unique_name.yaml'
+  domain:
+    title: Domain ldap to connect
+    type: string
+    deprecated: true
+example:
+  username: demo.user
+  password: "<PASSWORD>"
+  idp_name: local

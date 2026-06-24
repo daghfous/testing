@@ -1,0 +1,37 @@
+title: Scope content
+description: List of rights composed of action, resource and policy
+type: object
+required:
+  - action
+  - policy
+properties:
+  action:
+    $ref: 'action_id.yaml'
+  policy:
+    title: Policy structure
+    description: A rule to govern the access to the resource (i.e "allow" or "deny"), for now, only allow is supported,
+                 deny is not implemented yet
+    type: string
+    enum:
+      - allow
+      - deny
+    example: allow
+  resource:
+    type: object
+    additionalProperties:
+      title: Resource structure
+      description: Dict with parameter name as key and value a string, list value available or wildcard
+      example: {"customer": "bidule", "deployment": "*", "identification": ["a1", "a2"]}
+      oneOf:
+        - type: string
+          example: "*"
+          default: "*"
+        - type: array
+          items:
+            type: string
+example:
+  action: usr:get_users
+  policy: allow
+  resource:
+    department:
+      - engineering

@@ -1,0 +1,22 @@
+{{- if and .Values.authcontroller.enabled .Values.authcontroller.clusterRole.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "um.authcontroller.clusterRoleName" . | trim }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: auth-controller
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "um.authcontroller.serviceAccountName" . | trim }}
+  namespace: {{ .Release.Namespace }}
+  apiGroup: ""
+roleRef:
+  kind: ClusterRole
+  name: {{ include "um.authcontroller.clusterRoleName" . | trim }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

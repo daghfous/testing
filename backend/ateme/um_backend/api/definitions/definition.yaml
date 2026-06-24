@@ -1,0 +1,19 @@
+type: object
+description: |
+  OpenApi 3.0 definition (see https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#definitions), there is only the required fields to publish an API definition.
+required:
+  - info
+properties:
+  info:
+    type: object
+    required:
+      - x-auth
+    properties:
+      x-auth:
+        type: object
+        description: OpenAPI extension to add some description on your declared scopes.
+example:
+  info:
+    x-auth:
+      prefix: usr
+      label: Users

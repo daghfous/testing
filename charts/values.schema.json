@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "properties": {
+    "backend": {
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "maxLength": 38
+        },
+        "maxWorkers": {
+          "type": "integer",
+          "min": 1,
+          "max": 16
+        },
+        "ldapSyncPeriod": {
+          "type": "integer"
+        },
+        "ingress": {
+          "properties": {
+            "auth": {
+              "properties": {
+                "hostname": {
+                  "type": "string"
+                },
+                "extraHosts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "noauth": {
+              "properties": {
+                "hostname": {
+                  "type": "string"
+                },
+                "extraHosts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "frontend": {
+      "properties": {
+        "ingress": {
+          "properties": {
+            "noauth": {
+              "properties": {
+                "hostname": {
+                  "type": "string"
+                },
+                "extraHosts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "database": {
+      "properties": {
+        "certificate": {
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "createSecret": {
+              "type": "boolean"
+            },
+            "secretName": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

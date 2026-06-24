@@ -1,0 +1,28 @@
+type: object
+title: Token dict
+properties:
+  access_token:
+    type: string
+    title: access token
+    description: Access token to use in `Authorization` header for authentication
+    example: "<ACCESS_TOKEN>"
+  token_type:
+    type: string
+    title: type of token
+    description: Type of the token, used in `Authorization` header for authentication
+    example: Bearer
+  expires_in:
+    type: integer
+    title: expiration time in seconds
+    description: Expiration time in seconds for the access token
+    example: 3600
+  refresh_token:
+    type: string
+    title: refresh token
+    description: Refresh token to use in `refresh_token` endpoint to get new access token
+    example: "<REFRESH_TOKEN>"
+  reason:
+    type: string
+    title: reason for token invalidation
+    description: Reason for token invalidation, used in token introspection response when token is invalid
+    example: "Token expired"

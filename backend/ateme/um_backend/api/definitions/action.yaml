@@ -1,0 +1,50 @@
+type: object
+required:
+  - name
+  - prefix
+  - description
+  - label
+properties:
+  name:
+    title: Name of the action
+    description: |
+      The name of the action, which correspond to the operationId in openapi definition (snake_case or camelCase). Or it can be define with subapp prefix, but it might be deprecated in future release.
+    type: string
+    pattern: '^[a-zA-Z0-9_:]{1,}$'
+    example: "'delete_alarm' or 'suba:delete_alarm', 'GetAlarm' or 'DeleteE2EChannel'"
+  request:
+    $ref: 'request.yaml'
+  prefix:
+    $ref: 'prefix.yaml'
+  version:
+    type: integer
+    default: 1
+    description: Version of the action.
+    example: 1
+  title:
+    type: string
+    description: User friendly title. ex; Update user
+    example: Update user
+  label:
+    type: string
+    description: User Friendly field of API prefix.
+      Linking the prefix to its service is not always obvious for API users (ex `alaint` for the alarm service).
+      This field helps with a more user-friendly approach.
+    example: Alarm
+  description:
+    type: string
+    title: Description of the action
+    description: The description of the action
+    default: Missing description ...
+    example: This action allows to delete an alarm.
+  internal:
+    type: boolean
+    default: false
+    example: false
+    description: Flag indicating if the action is internal or not.
+  x_scope_match_children:
+    title: Parent scopes match his children 
+    description: The parent scopes are applied to all of his children endpoints
+    type: boolean
+    default: false
+    example: false

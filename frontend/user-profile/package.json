@@ -1,0 +1,37 @@
+{
+  "name": "user-profile",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "clean": "rm -rf node_modules package-lock.json",
+    "clean:full": "npm run clean && rm -rf dist",
+
+    "eslint:fix": "eslint --fix",
+    "eslint:report": "eslint --output-file reports/eslint/report.html --format html",
+    "vue-tsc": "vue-tsc --noEmit",
+    "lint": "npm run eslint:fix",
+    "lint:ci": "npm run eslint:report",
+
+    "dev": "vite --config ./config/vite.config.mts",
+    "build": "vite build --config ./config/vite.config.mts",
+    "preview": "vite preview",
+
+    "test:vitest": "vitest run",
+    "test:vitestUI": "vitest --ui"
+  },
+  "engines": {
+    "node": ">= 22.14.0",
+    "npm": ">= 10.9.2"
+  },
+  "dependencies": {
+    "@ateme/login-service": "file:../login-service"
+  },
+  "peerDependencies": {
+    "@ateme/cathodic-ui": "^6.0.0"
+  },
+  "devDependencies": {
+    "@ateme/eslint-config-ateme": "4.6.0",
+    "@ateme/ui-devtools": "7.6.0",
+    "vite-plugin-css-injected-by-js": "3.5.2"
+  }
+}

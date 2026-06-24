@@ -1,0 +1,8 @@
+title: Identity Provider type
+description: This field is used to specified a type of Identity Provider
+type: string
+enum:
+  - local
+  - ldap
+  - saml
+example: ldap

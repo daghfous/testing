@@ -1,0 +1,138 @@
+{
+  "api_descriptors": [
+    {
+      "prefix": "apione",
+      "url": "http://fake_url:8081"
+    },
+    {
+      "prefix": "apitwo",
+      "url": "http://fake_url:8082"
+    }
+  ],
+  "actions": [
+    {
+      "name": "put_one",
+      "label": "Api One",
+      "title": "Put Test",
+      "request": {
+        "method": "PUT",
+        "route": "/one"
+      },
+      "prefix": "apione",
+      "description": "Put Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    },
+    {
+      "name": "get_one",
+      "label": "Api One",
+      "title": "Get Test",
+      "request": {
+        "method": "GET",
+        "route": "/one"
+      },
+      "prefix": "apione",
+      "description": "Get Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    },
+    {
+      "name": "get_two",
+      "label": "Api Two",
+      "title": "Get Test",
+      "request": {
+        "method": "GET",
+        "route": "/two"
+      },
+      "prefix": "apitwo",
+      "description": "Get Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    },
+    {
+      "name": "put_two",
+      "label": "Api Two",
+      "title": "Put Test",
+      "request": {
+        "method": "PUT",
+        "route": "/two"
+      },
+      "prefix": "apitwo",
+      "description": "Put Test description",
+      "internal": false,
+      "x_scope_match_children": false
+    }
+  ],
+  "scopes": [
+    {
+      "id": "apione:administrator",
+      "label": "Api One",
+      "content": [
+        {
+          "action": "apione:put_one",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apione:get_one",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Administrator - api one",
+      "description": "Scope for administrator users on api one"
+    },
+    {
+      "id": "apione:guest",
+      "label": "Api One",
+      "content": [
+        {
+          "action": "apione:get_one",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Guest - api one",
+      "description": "Scope for guest users on api one"
+    },
+    {
+      "id": "apitwo:guest",
+      "label": "Api Two",
+      "content": [
+        {
+          "action": "apitwo:get_two",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apitwo:put_two",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Guest - api two",
+      "description": "Scope for guest users on api two"
+    },
+    {
+      "id": "apitwo:administrator",
+      "label": "Api Two",
+      "content": [
+        {
+          "action": "apitwo:put_two",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Administrator - api two",
+      "description": "Scope for administrator users on api two"
+    }
+  ]
+}

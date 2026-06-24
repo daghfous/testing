@@ -1,0 +1,57 @@
+type: object
+additionalProperties: true
+properties:
+  log_activity:
+    type: boolean
+    description: UNUSED
+    default: false
+    deprecated: true
+    example: false
+  password_expiration:
+    description: "Expiration period (in months) for the user passwords ('-1' for no expiration), Deprecated field."
+    type: integer
+    default: -1
+    minimum: -1
+    maximum: 365
+    deprecated: true
+  max_successive_failed_login:
+    description: "Max successive failed logins before disabling a user"
+    example: 5
+    type: integer
+    default: 3
+    maximum: 10
+    minimum: 1
+  user_deactivation_period:
+    description: "Period (in seconds) during the user is disabled after max_successive_failed_login ('-1' for an admin re-enables the user)"
+    type: integer
+    default: 600
+    maximum: 3600
+    minimum: -1
+    example: 900
+  token_expiration:
+    $ref: 'token_expiration.yaml'
+  refresh_token_expiration:
+    $ref: 'refresh_token_expiration.yaml'
+  token_cleaning_period:
+    description: "Period (in hours) at the end of which token auth is removed from db"
+    type: integer
+    default: 2
+    example: 6
+  logout_timeout:
+    description: "Timeout period (in seconds) after user inactivity (only used in FE)"
+    type: integer
+    default: -1
+    minimum: -1
+    example: 900
+  password_policy:
+    $ref: 'password_policy.yaml'
+example:
+  max_successive_failed_login: 5
+  user_deactivation_period: 900
+  token_expiration: 3600
+  refresh_token_expiration: 604800
+  token_cleaning_period: 6
+  logout_timeout: 900
+  password_policy:
+    expiration_delay_in_days: 90
+    password_min_length: 12

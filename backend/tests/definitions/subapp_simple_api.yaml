@@ -1,0 +1,72 @@
+openapi: "3.0.0"
+info: 
+  title: "Test API"
+  version: "1.0.0"
+  x-auth:
+    prefix: "sub"
+    label: "sub"
+paths:
+  /ping:
+    get:
+      operationId: get_ping
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Ping server
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+  /test:
+    get:
+      operationId: get_test
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest", "operator"]
+  /protected:
+    get:
+      operationId: get_protected
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+      x-scopes: []
+  /:
+    get:
+      operationId: get_root
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+  /definition:
+    $ref: '#__auto_definition'
+  /documentation:
+    $ref: '#__auto_doc'
+
+
+components:
+  responses:
+    default_200_responses:
+      description: "So far, so good."
+      content:
+        text/plain:
+          schema:
+            type: string
+  schemas:
+    testResponse:
+      type: string

@@ -1,0 +1,88 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "um.frontend.fullname" . }}-nginx
+  labels:
+    app: {{ template "um.frontend.fullname" . }}
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  nginx.conf: |
+    #user 2000;
+    worker_processes {{ .Values.frontend.workerProcesses }};
+    pid /ateme/nginx/pid/nginx.pid;
+    include /etc/nginx/modules-enabled/*.conf;
+
+    events {
+            worker_connections 1024;
+            # multi_accept on;
+    }
+
+    http {
+
+            ##
+            # Basic Settings
+            ##
+
+            sendfile on;
+            tcp_nopush on;
+            tcp_nodelay on;
+            keepalive_timeout 65;
+            types_hash_max_size 2048;
+            # server_tokens off;
+
+            # server_names_hash_bucket_size 64;
+            # server_name_in_redirect off;
+
+            include /ateme/nginx/required/mime.types;
+            default_type application/octet-stream;
+
+            ##
+            # SSL Settings
+            ##
+
+            ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+            ssl_prefer_server_ciphers on;
+
+            ##
+            # Logging Settings
+            ##
+
+            access_log /dev/stdout;
+            error_log /dev/stderr warn;
+
+            ##
+            # Gzip Settings
+            ##
+
+            gzip on;
+
+            # gzip_vary on;
+            # gzip_proxied any;
+            # gzip_comp_level 6;
+            # gzip_buffers 16 8k;
+            # gzip_http_version 1.1;
+            # gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+            ##
+            # Temporary directories for kubernetes "readOnlyFilesystem"
+            ##
+            client_body_temp_path /tmp/client_body_temp 1 2;
+            proxy_temp_path /tmp/proxy_temp 1 2;
+            fastcgi_temp_path /tmp/fastcgi_temp 1 2;
+            uwsgi_temp_path /tmp/uwsgi_temp 1 2;
+            scgi_temp_path /tmp/scgi_temp 1 2;
+
+            ##
+            # Virtual Host Configs
+            ##
+
+            include /ateme/nginx/conf.d/*.conf;
+            # include /etc/nginx/sites-enabled/*;
+    }
+{{- end }}

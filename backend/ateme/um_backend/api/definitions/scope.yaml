@@ -1,0 +1,59 @@
+title: Scope schema
+description: This object descibe the schema of a scope
+type: object
+required:
+  - label
+  - content
+properties:
+  id:
+    $ref: 'scope_id.yaml'
+  version:
+    type: integer
+    default: 1
+    example: 1
+  title:
+    type: string
+    description: User friendly title. ex; Alarm admin scope
+    example: Alarm admin scope
+  label:
+    type: string
+    description: User Friendly field of API prefix.
+      Linking the prefix to its service is not always obvious for API users (ex `alaint` for the alarm service).
+      This field helps with a more user-friendly approach.
+    example: Alarm Admin
+  description:
+    type: string
+    title: Scope description
+    description: User friendly description. ex; Admin scope to manage alarms
+    example: Admin scope to manage alarms
+  default:
+    type: boolean
+    title: Scope by default
+    description: true when the scope has been added on startup, false if it has been created from API
+    default: false
+    example: false
+  content:
+    title: Scope content
+    description: >-
+      This object descibe the content of the scope. This content can be definied
+      as a list of {action, policy, resources}, a list of scope identifier or a mix of both.
+    type: array
+    items:
+      oneOf:
+        - type: object
+          required: ["scope"]
+          properties:
+            scope:
+              $ref: 'scope_id.yaml'
+        - $ref: 'scope_content.yaml'
+  internal:
+    type: boolean
+    default: false
+    example: false
+example:
+  id: usr:engineer
+  label: Engineer
+  description: Engineer role permissions
+  content:
+    - action: usr:get_users
+      policy: allow

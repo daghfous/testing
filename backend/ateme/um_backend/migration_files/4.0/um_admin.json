@@ -1,0 +1,17 @@
+{
+    "title": "Migration schema for collection admin of User Management for version 4.0",
+    "component": "user-management",
+    "collection": "admin",
+    "version": "4.0",
+    "import_policy": {
+      "conflict_management": "override",
+      "key_index": [
+        {"user_id": "ASCENDING"},
+        {"username": "ASCENDING"}
+      ]
+     },
+    "export_policy": {
+      "filters": {"internal": {"$ne": true}, "scopes": {"$regex": "administrator"}},
+      "fields": {"_id": 0}
+    }
+}

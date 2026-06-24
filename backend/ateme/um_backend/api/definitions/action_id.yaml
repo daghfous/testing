@@ -1,0 +1,5 @@
+title: Action identifier.
+description: This field is used to identify the action, it must contain 'operationId' and it might contains prefix and app_name.
+type: string
+pattern: '^([a-z0-9]([-a-z0-9]*[a-z0-9])?:[a-z0-9]{3,10}|^[a-z0-9]{3,10}|[*]):([a-zA-Z0-9_]+|[*]|[a-zA-Z0-9]{3,10}:([a-zA-Z0-9_]+|[\*]))$'
+example: "'ala:get_ping', 'app-name:ala:get_ping', 'ala:*', '*:get_ping', '*:ala:get_ping' or 'e2e:DeleteE2EChannel'"

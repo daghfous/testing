@@ -1,0 +1,78 @@
+type: object
+additionalProperties: true
+required:
+  - username
+properties:
+  username:
+    type: string
+    title: user username
+    description: Unique username used for authentication.
+    example: demo.user
+    minLength: 3
+  password:
+    type: string
+    title: user password
+    description: User password used for authentication.
+    example: "<PASSWORD>"
+  enabled:
+    type: boolean
+    default: true
+    example: true
+    description: Flag indicating if the user is enabled or not.
+  scopes:
+    type: array
+    title: user scopes
+    items:
+      $ref: 'scope_id.yaml'
+    description: Scopes assigned to the user, used for authorization.
+  authenticate_mode:
+    type: string
+    enum:
+      - local
+      - ldap
+    default: local
+    title: authenticate mode
+    description: Mode used for user authentication.
+    deprecated: true
+    example: local
+  idp_name:
+    $ref: 'idp_unique_name.yaml'
+  level:
+    type: integer
+    minimum: 0
+    example: 1
+    description: User level.
+  first_login:
+    type: boolean
+    description: Flag indicating if it's the user's first login.
+    example: true
+  internal:
+    type: boolean
+    default: false
+    example: false
+    description: Flag indicating if the user is internal or not.
+  domain_ldap:
+    type: string
+    deprecated: true
+    description: Domain name for LDAP users, used for authentication. This field is deprecated and should not be used.
+    example: CORP
+  preferences:
+    type: object
+    description: User preferences.
+  session_timeout_disabled:
+    title: Session Timeout Disabled Flag
+    description: Flag to disable session timeout for the user
+    default: false
+    type: boolean
+    example: false
+  password_expiration_disabled:
+    title: Disable Password Expiration Flag
+    description: Flag to disable password expiration for the user. This flag is applicable for LOCAL users only.
+    default: false
+    example: false
+    type: boolean
+  password_expired:
+    type: boolean
+    description: Flag indicating if the password has expired or not. This flag is applicable for LOCAL users only.
+    default: false
+    example: false

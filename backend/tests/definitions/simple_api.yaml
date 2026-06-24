@@ -1,0 +1,160 @@
+openapi: "3.0.0"
+info: 
+  title: "Test API"
+  version: "1.0.0"
+  x-auth: 
+    prefix: test
+    label: Tests
+    scope_descriptions:
+      administrator: Role granting full access to all users, roles, and identity management functionalities.
+      engineer: Role allowing configuration-related actions with additional permissions on users, roles, and identity management functionalities.
+      guest: Role with minimal access, limited to viewing personal information, logging out, and changing the password.
+paths:
+  /ping:
+    get:
+      operationId: get_ping
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Ping server
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+  /test-numbers:
+    get:
+      operationId: GetE2EChannel
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Test that a number is accepted in operationId
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+  /test:
+    get:
+      operationId: get_test
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+      x-scope-match-children: true
+    options:
+      operationId: options_test
+      responses:
+        '200':
+          description: OK
+      description: Options Test
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+    head:
+      operationId: head_test
+      responses:
+        '200':
+          description: OK
+      description: Head Test
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+    trace:
+      operationId: trace_test
+      responses:
+        '200':
+          description: OK
+      description: Trace Test
+      tags: [test]
+      x-scopes: ["administrator", "engineer", "guest"]
+  /test/v2:
+    get:
+      operationId: get_ping
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Ping server
+      tags: [test]
+  /test/v2/v3:
+    get:
+      operationId: get_ping
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Ping server
+      tags: [test]
+  /test/{test_id}/v4:
+    get:
+      operationId: get_ping
+      parameters:
+        - name: "test_in_query"
+          in: "query"
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Test in query
+        - in: path
+          name: test_id
+          description: Test Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/default_200_responses'
+      description: Ping server
+      tags: [test]
+  /protected:
+    get:
+      operationId: get_protected
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: Get test
+      tags: [test]
+      x-scopes: []
+  /definition:
+    $ref: '#__auto_definition'
+  /documentation:
+    $ref: '#__auto_doc'
+  /internal_users_test:
+    get:
+      operationId: get_internal_users_test
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/testResponse'
+          description: OK
+      description: "Get Internal users test"
+      tags: [test]
+      x-scopes: ["internal_administrator"]
+  /hostname:
+    get:
+      operationId: GetHostname
+      responses:
+        '200':
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: Return hostname
+      description: Return hostname with operation_id define in camelCase
+      x-scopes: ["administrator", "engineer", "guest"]
+
+components:
+  responses:
+    default_200_responses:
+      description: "So far, so good."
+      content:
+        text/plain:
+          schema:
+            type: string
+  schemas:
+    testResponse:
+      type: string

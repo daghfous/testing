@@ -1,0 +1,16 @@
+title: idp local config structure.
+description: This data structure describe the local_config format exposed by the API.
+type: object
+additionalProperties: false
+properties:
+  idp_type:
+    $ref: './idp_type.yaml'
+    default: local
+  idp_name:
+    $ref: './idp_unique_name.yaml'
+  idp_label:
+    $ref: './idp_label.yaml'
+example:
+  idp_type: local
+  idp_name: local
+  idp_label: Local Users

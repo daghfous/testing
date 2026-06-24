@@ -1,0 +1,31 @@
+type: object
+required:
+  - method
+  - route
+properties:
+  method:
+    title: Method of request
+    description: The method of request
+    type: string
+    enum:
+      - "POST"
+      - "GET"
+      - "PUT"
+      - "DELETE"
+      - "PATCH"
+      - "HEAD"
+      - "OPTIONS"
+      - "TRACE"
+      - "CONNECT"
+    example: "DELETE"
+  route:
+    title: The route for the request
+    description: >-
+      The route on wich the request is sent.
+      "/<path>" or "/<path>/{id}" if a resource is required.
+    type: string
+    example: "/alarm/{id}"
+    pattern: "^/.*"
+example:
+  method: GET
+  route: /users

@@ -1,0 +1,24 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "um.frontend.fullname" . }}
+  labels:
+    app: {{ template "um.frontend.fullname" . }}
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  ports:
+    - port: {{ .Values.frontend.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "um.frontend.fullname" . }}
+    release: {{ .Release.Name }}
+{{- end }}

@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools~=82.0", "wheel~=0.46", "setuptools_scm~=10.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ateme-um-backend"
+dynamic = ["version"]
+dependencies = [
+  'ateme-log~=2.5',
+  'ateme-openapi~=3.13',
+  'ateme-encryption~=1.11',
+  'ateme-updater~=1.12',
+  'dnspython~=2.8',
+  'python-ldap~=3.4',
+  'python3-saml~=1.16',
+  'packaging~=26.0',
+  'pymongo~=4.16'
+]
+optional-dependencies.docs = [
+    'markdown~=3.8',
+    'pdoc3~=0.11'
+]
+optional-dependencies.tests = [
+  # we have to update test to upgrade on new pytest-asyncio
+  # & pytest versions
+  'pytest~=8.4',
+  'pytest-asyncio~=0.26',
+  'pytest-aiohttp~=1.1',
+  'pytest-cov~=7.1',
+  'pytest-mock~=3.15',
+  'allure-pytest~=2.15',
+  'pytest-rerunfailures~=15.1',
+  'ateme-api-tests-tools~=0.8',
+  'pytest-test-groups~=1.2'
+]
+optional-dependencies.mypy = [
+   "mypy[reports]~=1.19",
+]
+requires-python = ">=3.11"
+authors = [
+  {name = "ATEME", email = "support@ateme.com"}
+]
+description = "Ateme user management service"
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  'Development Status :: 5 - Production/Stable',
+  # Specify the Python versions you support here. In particular, ensure
+  # that you indicate whether you support Python 2, Python 3 or both.
+  'Programming Language :: Python :: 3.11',
+]
+
+[project.scripts]
+check-upgrade = "ateme.um_backend.scripts.pre_upgrade_job.__main__:check_upgrade"
+upgrade = "ateme.um_backend.scripts.pre_upgrade_job.__main__:upgrade"
+generate_auth = "ateme.um_backend.scripts.generate_auth.__main__:main"
+
+[tool.setuptools_scm]
+root = ".."
+local_scheme = "node-and-date"
+version_scheme = "guess-next-dev"
+
+[tool.setuptools.packages.find]
+namespaces = true
+include = ["ateme.*"]
+
+[tool.coverage.run]
+omit = ["tests/*", ".tox/*"]
+
+[tool.pylint.main]
+ignore-patterns = ["^\\.#"]
+py-version = "3.11"
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.messages_control]
+disable = [
+  "fixme",
+  "broad-exception-raised",
+  "broad-exception-caught"
+]
+
+[tool.pytest.ini_options]
+markers = [
+  "configuration: relate to configuration structure",
+  "user: relate to user structure",
+  "token: relate to token structure",
+  "admin: relate to admin structure",
+  "action: relate to action structure",
+  "scope: relate to scope structure",
+  "api_descriptor: relate to api descriptor structure",
+  "idp: relate to identity provider structure",
+  "client: relate to client structure",
+  "auth_data: relate to auth data structure",
+  "updater: relate to updater mechanism",
+  "ldap: relate to LDAP mechanism & structure",
+]
+asyncio_mode = "auto"
+log_cli = 1
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

@@ -1,0 +1,271 @@
+{
+  "api_descriptors": [
+    {
+      "prefix": "apm",
+      "url": "http://127.0.0.1:1234"
+    }
+  ],
+  "actions": [
+    {
+      "name": "uninstall_app_by_name",
+      "label": "apm",
+      "title": "Uninstall an installed application from a given repository with name matching '{repo}/{application}'",
+      "request": {
+        "method": "DELETE",
+        "route": "/applications/deployed/{app_release_name}"
+      },
+      "prefix": "apm",
+      "description": "Uninstall an installed application from a given repository with name matching '{repo}/{application}'",
+      "internal": false
+    },
+    {
+      "name": "get_app_values",
+      "label": "apm",
+      "title": "Get the values of an installed application with its release_name",
+      "request": {
+        "method": "GET",
+        "route": "/applications/deployed/{app_release_name}/values"
+      },
+      "prefix": "apm",
+      "description": "Get the values of an installed application with its release_name",
+      "internal": false
+    },
+    {
+      "name": "upgrade_app",
+      "label": "apm",
+      "title": "Upgrade a deployed application",
+      "request": {
+        "method": "POST",
+        "route": "/applications/deployed/{app_release_name}/upgrade"
+      },
+      "prefix": "apm",
+      "description": "Upgrade and return the status for a specific deployed application (from repo, application and version parameter in body);\nrelease name and values can be configured.\n",
+      "internal": false
+    },
+    {
+      "name": "deprecated_upgrade_app",
+      "label": "apm",
+      "title": "Upgrade a deployed application",
+      "request": {
+        "method": "PUT",
+        "route": "/applications/deployed/{app_release_name}/upgrade"
+      },
+      "prefix": "apm",
+      "description": "Upgrade and return the status for a specific deployed application (from repo, application and version parameter in body);\nrelease name and values can be configured.\nCaution this method have been deprecated for the benefit of POST /applications/deployed/{app_release_name}/upgrade.\n",
+      "internal": false
+    },
+    {
+      "name": "get_deployed_apps_importmap",
+      "label": "apm",
+      "title": "Get deployed applications frontend imports",
+      "request": {
+        "method": "GET",
+        "route": "/applications/deployed/importmap"
+      },
+      "prefix": "apm",
+      "description": "Return deployed applications frontend imports\n",
+      "internal": false
+    },
+    {
+      "name": "get_deployable_apps",
+      "label": "apm",
+      "title": "Get deployable applications in the repositories",
+      "request": {
+        "method": "GET",
+        "route": "/applications/catalog"
+      },
+      "prefix": "apm",
+      "description": "Return deployable applications in the repositories",
+      "internal": false
+    },
+    {
+      "name": "get_deployable_apps_values",
+      "label": "apm",
+      "title": "Get values of a deployable application for a specific version in a given repository with name matching '{repo}/{application}/{version}'",
+      "request": {
+        "method": "GET",
+        "route": "/applications/catalog/{repo}/{application}/{version}/values"
+      },
+      "prefix": "apm",
+      "description": "Return values of a specific deployable application in a given repository with name matching '{repo}/{application}/{version}'\n",
+      "internal": false
+    },
+    {
+      "name": "get_deployable_apps_by_name",
+      "label": "apm",
+      "title": "Get the information of deployable applications in a given repository with name matching '{repo}/{application}'",
+      "request": {
+        "method": "GET",
+        "route": "/applications/catalog/{repo}/{application}"
+      },
+      "prefix": "apm",
+      "description": "Return the info of a specific deployable applications in a given repository with name matching '{repo}/{application}'\n",
+      "internal": false
+    },
+    {
+      "name": "deprecated_install_app",
+      "label": "apm",
+      "title": "Install a deployable application",
+      "request": {
+        "method": "PUT",
+        "route": "/applications/install"
+      },
+      "prefix": "apm",
+      "description": "Install and return the status for a specific deployable application installation (from repo, application and version parameter in body);\nrelease name and values can be configured\nCaution this method have been deprecated for the benefit of POST /applications/install.\n",
+      "internal": false
+    },
+    {
+      "name": "install_app",
+      "label": "apm",
+      "title": "Install a deployable application",
+      "request": {
+        "method": "POST",
+        "route": "/applications/install"
+      },
+      "prefix": "apm",
+      "description": "Install and return the status for a specific deployable application installation (from repo, application and version parameter in body);\nrelease name and values can be configured\n",
+      "internal": false
+    },
+    {
+      "name": "get_config_map_variables",
+      "label": "apm",
+      "title": "Get the variables contained in the configmap file",
+      "request": {
+        "method": "GET",
+        "route": "/applications/deployed/{app_release_name}/variables"
+      },
+      "prefix": "apm",
+      "description": "Return the variables contained in the configmap file",
+      "internal": false
+    },
+    {
+      "name": "get_namespace_names",
+      "label": "apm",
+      "title": "Get all the annotated namespace names in the cluster",
+      "request": {
+        "method": "GET",
+        "route": "/applications/namespaces"
+      },
+      "prefix": "apm",
+      "description": "Return a list containing all the annotated namespace names",
+      "internal": false
+    }
+  ],
+  "scopes": [
+    {
+      "id": "apm:administrator",
+      "label": "apm",
+      "content": [
+        {
+          "action": "apm:uninstall_app_by_name",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_app_values",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:upgrade_app",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:deprecated_upgrade_app",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployed_apps_importmap",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployable_apps",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployable_apps_values",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployable_apps_by_name",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:deprecated_install_app",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:install_app",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_config_map_variables",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_namespace_names",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Administrator - apm",
+      "description": "Scope with full permissions to manage applications, upgrade and uninstall."
+    },
+    {
+      "id": "apm:engineer",
+      "label": "apm",
+      "content": [
+        {
+          "action": "apm:get_app_values",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployed_apps_importmap",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployable_apps",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployable_apps_values",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_deployable_apps_by_name",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_config_map_variables",
+          "policy": "allow",
+          "resource": {}
+        },
+        {
+          "action": "apm:get_namespace_names",
+          "policy": "allow",
+          "resource": {}
+        }
+      ],
+      "default": true,
+      "internal": false,
+      "title": "Engineer - apm",
+      "description": "Scope with permissions to get deployed applications and view catalog."
+    }
+  ]
+}

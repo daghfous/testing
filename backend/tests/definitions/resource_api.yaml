@@ -1,0 +1,35 @@
+openapi: "3.0.0"
+info: 
+  title: "Test API"
+  version: "1.0.0"
+  x-auth:
+    prefix: "test"
+    label: "test"
+paths:
+  /resources/{name}/{idx}:
+    parameters:
+      - name: "name"
+        in: "path"
+        description: "resource name"
+        required: true
+        schema:
+          type: string
+      - name: "idx"
+        in: "path"
+        description: "idx"
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: get_resource
+      description: Get resource by name
+      tags:
+        - resource
+      x-scopes: ["goal"]
+      responses:
+        '200':
+          description: User config object
+          content:
+            application/json:
+              schema:
+                type: object

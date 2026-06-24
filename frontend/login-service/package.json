@@ -1,0 +1,43 @@
+{
+  "name": "@ateme/login-service",
+  "version": "14.0.1-beta-13139-2",
+  "description": "The User Management login service",
+  "author": "Ateme",
+  "files": [
+    "src/*"
+  ],
+  "engines": {
+    "node": ">= 22.14.0",
+    "npm": ">= 10.9.2"
+  },
+  "scripts": {
+    "clean:packageLock": "rm -rf package-lock.json",
+    "clean:nodeModules": "rm -rf node_modules",
+    "yalc:watch": "chokidar './src/**/*' -c 'yalc publish --push'",
+    "watch-tsc-errors": "vue-tsc --watch --pretty",
+    "eslint": "eslint --ext .js,.vue,.ts .  --ignore-pattern node_modules/ --fix",
+    "vue-tsc": "vue-tsc",
+    "lint": "npm run prettier && npm run eslint --fix && npm run vue-tsc",
+    "prettier": "prettier . --write",
+    "prettier:ci": "prettier . --check",
+    "prepush": "npm run lint"
+  },
+  "dependencies": {
+    "axios": "1.13.0"
+  },
+  "devDependencies": {
+    "@ateme/cathodic-ui": "6.18.1",
+    "@ateme/eslint-config-ateme": "4.8.1",
+    "@ateme/ui-devtools": "7.6.0",
+    "@casl/ability": "^6.5.0",
+    "@casl/vue": "^2.2.1",
+    "pinia": "3.0.1",
+    "vue-tsc": "2.2.8"
+  },
+  "peerDependencies": {
+    "@ateme/cathodic-ui": ">=6.0.0"
+  },
+  "overrides": {
+    "@ateme/cathodic-ui": "6.18.1"
+  }
+}

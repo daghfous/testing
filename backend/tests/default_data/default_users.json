@@ -1,0 +1,10 @@
+[
+    {
+        "username": "Import-export user",
+        "password": "Secret@123",
+        "scopes": [
+            "technical:import_export_user"
+        ],
+        "internal": true
+    }
+]

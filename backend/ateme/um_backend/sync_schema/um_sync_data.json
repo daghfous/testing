@@ -1,0 +1,16 @@
+{
+  "title": "Sync data for User Management",
+  "component": "user-management",
+  "schema_version": "1.0",
+  "version_list": {
+    "latest": {
+      "version_description": "Version latest",
+      "collections": {
+        "users": "latest/um_users.json",
+        "idp_config": "latest/um_idp_config.json",
+        "configuration": "latest/um_configuration.json",
+        "scopes": "latest/um_scopes.json"
+      }
+    }
+  }
+}

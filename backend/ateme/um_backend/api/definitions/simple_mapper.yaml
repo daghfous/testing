@@ -1,0 +1,49 @@
+type: object
+title: IDP SAML/LDAP simple mapper config structure
+description: This data structure describe the SAML/LDAP IDP simple mapper data structure
+required:
+  - type
+  - attributes
+  - scopes_to_add
+properties:
+  _id:
+    title: ID of the mapper
+    type: string
+    description: ID of the mapper, used for mapper edition and deletion
+    example: 676810251f4d8840b8e42832
+  type:
+    title: Type of the mapper
+    type: string
+    enum:
+      - simple
+    example: simple
+    description: Type of the mapper, used to determine how the mapper will be applied.
+  attributes:
+    type: array
+    title: Mapper attributes
+    description: Attributes that SAML/LDAP response must match to apply scopes
+    items:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          title: Mapper attribute name
+          description: Attribute name that matches to apply the mapper
+          example: department
+        value:
+          type: string
+          title: Mapper attribute value
+          description: Attribute value that matches to apply the mapper
+          example: engineering
+    description: Attributes that SAML/LDAP response must match to apply scopes
+  scopes_to_add:
+    type: array
+    title: Mapper scopes
+    items:
+      $ref: 'scope_id.yaml'
+    description: Scopes (roles) that logging users must be associated with.
+    example:
+      - usr:engineer

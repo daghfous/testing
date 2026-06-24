@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_2fe4286867416171a1ed" InResponseTo="ONELOGIN_124dba9c1412d064e8da55a9ab3a8b0587eaabcb" Version="2.0" IssueInstant="2023-11-14T08:42:02.308Z" Destination="http://172.29.71.110/pmf-elz/users/assertion_consumer_service">
+  <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">urn:dev-oqt40rlktz2p33p5.us.auth0.com</saml:Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Version="2.0" ID="_t7Q8uomQ4zTaE1ONC4p6kfNUHZPkhLoJ" IssueInstant="2023-11-14T08:42:02.298Z">
+    <saml:Issuer>urn:dev-oqt40rlktz2p33p5.us.auth0.com</saml:Issuer>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+      <SignedInfo>
+        <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+        <Reference URI="#_t7Q8uomQ4zTaE1ONC4p6kfNUHZPkhLoJ">
+          <Transforms>
+            <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          </Transforms>
+          <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+          <DigestValue>z+tFCplMMmaGumBiUlqEbu2fwKmcS/4ScIXoJ5Xv5Kg=</DigestValue>
+        </Reference>
+      </SignedInfo>
+      <SignatureValue>gqSWfXnw5OTWwg9KyZrZPAGYuHi/MCDkd+sMGd0R1PHOVQ21nJde4rtlc6JoUm2dR8SXlJOzAcfxEsfkvXJPTAgnehR19744ov/7051BPvsxZizHRI6d+0OOwRcATbF4QK8QBtiRJ63mSS97zQlMLvloUtrMbOWuoMlHnm5XACfq1WSF6jASvasGuE50S/ZKz0dRhUc9Eg7+hOuXQpf/3Lu6req7CHYNskxp4+hknq7OrZpm2PHIP6woB8N2pvE452mU46by1gINOakaEru2be3XQnwA7ocgSpQ8tcw3wxc+Pm2/VhhWzfewSqv1iME3QPigv5MYy74mgsw3PwWkjQ==</SignatureValue>
+      <KeyInfo>
+        <X509Data>
+          <X509Certificate>MIIDHTCCAgWgAwIBAgIJQVu6HOKprI+RMA0GCSqGSIb3DQEBCwUAMCwxKjAoBgNVBAMTIWRldi1vcXQ0MHJsa3R6MnAzM3A1LnVzLmF1dGgwLmNvbTAeFw0yMzExMDIxNDM2MzNaFw0zNzA3MTExNDM2MzNaMCwxKjAoBgNVBAMTIWRldi1vcXQ0MHJsa3R6MnAzM3A1LnVzLmF1dGgwLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKJz4FCF7JsMtM8iP6fVtU8iYO0wGBXWeIQdqZVZX1NL0h0WmoKEVPBnVpoeNTRDeDEv9FD7zvMDwpziEXYcr9pwyJdvOaFZc4ptLx0j8yk+3I4FjNohQvcWpzt2zdt23uiB6KpyUViZdtdAaWbaeCpY4Mz4TDC/12iXMGM8G4QkTUR3Y1XCiFOzc9bxDkbkWBcxZMhUaeH4ljLD7YI7gSZmVcR4Rv1V2HOmIZMZ3KcBW8f5M/+8WbghzPOZwwZhfT9ke3Ny5WaElub6jd52STQP12LbZR/Sne7ttG1dIo0/hlGPolyUQl3biniwCTbzma+dEM1DCbTXxlrWZylgqhcCAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUugrkqWSmeQHExC51sz5IoFZn2HUwDgYDVR0PAQH/BAQDAgKEMA0GCSqGSIb3DQEBCwUAA4IBAQB1szLlGtBYip8rk92ofynG5Ocg1yNr/NyT70mAwBxHsKpJzjczviUFYUNxaWI5D7t9SmU6+fUHrCfiv4zNvazDZIuu9JENRGNHxdi1uLngF0aqjs1PgKvZjyvmndYGSkp74fvbEeKzPV5vERIXAAgq/MF7kpHF6IDWDxKuIdSn9XbGjuoyI86FLboAHnAtKvrgsDd3e3XXkEuPQpYPuUb1g0HC9ZHoV7m17TqjCpD7zuzO7A8YTx2M4jyMtOx/r9ocg03jhap9wB2wadavxQuA/fu5H/QGPYZbG6Sfx6crE9YZbXXhGwxWuvJWKQz3a1gkkT7fDIVDwXYsarRGa+QP</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </Signature>
+    <saml:Subject>
+      <saml:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">auth0|6543b4b33c1b8409bae2ff50</saml:NameID>
+      <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <saml:SubjectConfirmationData NotOnOrAfter="2023-11-14T09:42:02.298Z" Recipient="http://172.29.71.110/pmf-elz/users/assertion_consumer_service" InResponseTo="ONELOGIN_124dba9c1412d064e8da55a9ab3a8b0587eaabcb"/>
+      </saml:SubjectConfirmation>
+    </saml:Subject>
+    <saml:Conditions NotBefore="2023-11-14T08:42:02.298Z" NotOnOrAfter="2023-11-14T09:42:02.298Z">
+      <saml:AudienceRestriction>
+        <saml:Audience>urn:auth0:dev-oqt40rlktz2p33p5:pfs</saml:Audience>
+      </saml:AudienceRestriction>
+    </saml:Conditions>
+    <saml:AuthnStatement AuthnInstant="2023-11-14T08:42:02.298Z" SessionIndex="_MqYaT4nW2knEssSHOweXsjn1NFuAc91l">
+      <saml:AuthnContext>
+        <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified</saml:AuthnContextClassRef>
+      </saml:AuthnContext>
+    </saml:AuthnStatement>
+    <saml:AttributeStatement xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <saml:Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">auth0|6543b4b33c1b8409bae2ff50</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">pfs@ateme.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">pfs@ateme.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">pfs@ateme.com</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/identities/default/connection" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">Username-Password-Authentication</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/identities/default/provider" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">auth0</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/identities/default/isSocial" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:boolean">false</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/clientID" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">ChJp3DTalPvuW4byKoXw80vZHyVIvBi6</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/created_at" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:anyType">Thu Nov 02 2023 14:39:47 GMT+0000 (Coordinated Universal Time)</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/email_verified" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:boolean">false</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/nickname" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">pfs</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/picture" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:string">https://s.gravatar.com/avatar/4e443b38128e921d10ed19daec66db70?s=480&amp;r=pg&amp;d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fpf.png</saml:AttributeValue>
+      </saml:Attribute>
+      <saml:Attribute Name="http://schemas.auth0.com/updated_at" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+        <saml:AttributeValue xsi:type="xs:anyType">Mon Nov 13 2023 10:23:50 GMT+0000 (Coordinated Universal Time)</saml:AttributeValue>
+      </saml:Attribute>
+    </saml:AttributeStatement>
+  </saml:Assertion>
+</samlp:Response>
+

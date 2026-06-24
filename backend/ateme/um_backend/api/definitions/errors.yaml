@@ -1,0 +1,9 @@
+type: object
+properties:
+  errors:
+    type: array
+    title: List of errors
+    description: List of error messages describing the errors that occurred during the request processing
+example:
+  errors:
+    - user demo.user already exists

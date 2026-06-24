@@ -1,0 +1,17 @@
+{
+  "title": "Migration schema for collection users of User Management for version 5.0",
+  "component": "user-management",
+  "collection": "users",
+  "version": "5.0",
+  "import_policy": {
+    "conflict_management": "abort",
+    "key_index": [
+      {"user_id": "ASCENDING", "idp_name":  "ASCENDING"},
+      {"username": "ASCENDING", "idp_name":  "ASCENDING"}
+    ]
+   },
+  "export_policy": {
+    "filters": {"internal": {"$ne": true}},
+    "fields": {"_id": 0}
+  }
+}

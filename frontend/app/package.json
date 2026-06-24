@@ -1,0 +1,38 @@
+{
+  "name": "@ateme/user-management",
+  "version": "11.10.0-b.1",
+  "description": "The User Management GUI",
+  "author": "ATEME",
+  "scripts": {
+    "vue-tsc": "vue-tsc",
+    "lint": "npm run prettier && npm run eslint --fix && npm run vue-tsc",
+    "eslint": "eslint --ext .js,.vue,.ts .  --ignore-pattern node_modules/ --fix",
+    "prettier": "prettier . --write",
+    "prettier:ci": "prettier . --check",
+    "dev": "vite --config ./config/vite.config.mts",
+    "build": "vite build --config ./config/vite.config.mts",
+    "preview": "vite preview --config ./config/vite.config.mts"
+  },
+  "jest": {
+    "preset": "@ateme/jest-preset-ateme"
+  },
+  "engines": {
+    "node": ">= 22.14.0",
+    "npm": ">= 10.9.2"
+  },
+  "devDependencies": {
+    "@ateme/eslint-config-ateme": "4.8.1",
+    "@ateme/ui-devtools": "7.6.0",
+    "pinia": "3.0.1",
+    "axios": "1.13.0",
+    "vue-tsc": "2.2.8"
+  },
+  "dependencies": {
+    "@ateme/cathodic-ui": "6.18.1",
+    "@ateme/login-service": "file:../login-service"
+  },
+  "overrides": {
+    "htmlparser2": "8.0.0",
+    "typescript": "5.4.2"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Failover synchronization schema for collection idp_config of User Management for version latest",
+  "component": "user-management",
+  "collection": "idp_config",
+  "version": "latest",
+  "import_policy": {
+    "conflict_management": "override",
+    "key_index": [
+      {"idp_name": "ASCENDING"}
+    ]
+   },
+  "export_policy": {
+    "filters": {},
+    "fields": {"_id": 0}
+  }
+}

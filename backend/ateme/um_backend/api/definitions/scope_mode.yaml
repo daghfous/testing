@@ -1,0 +1,13 @@
+type: string
+description: |
+  This field is used to filter scopes.
+  Two modes are defined:
+  - expert mode: Retrieve ALL scopes
+  - basic mode: Retrieve only all:xxx, PMF components scopes, usr:xxx,
+                Hat applications scopes: app_name_n:xxx
+                where xxx is [administrator, engineer, operator, monitoring, guest]
+enum:
+  - basic
+  - expert
+default: expert
+example: basic

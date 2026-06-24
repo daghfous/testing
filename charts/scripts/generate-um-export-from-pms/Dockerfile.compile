@@ -1,0 +1,13 @@
+ARG ATEME_NEXUS_DOCKER_HUB_PRIVATE=nexus-rennes.ateme.net:10443
+ARG BASE_IMAGE=environment/base-image:2.11.0
+ARG COMPILER_IMAGE=environment/python-compiler:2.15.0
+ARG PACKAGE_PRETEND_VERSION=0.0.0
+
+#=========================
+FROM $ATEME_NEXUS_DOCKER_HUB_PRIVATE/$COMPILER_IMAGE as compiler
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY generate_um_export_from_pms.py .
+
+RUN nuitka-compiler  --binary-output-name app.out  --output-dir /opt/app.dist --entry-point=generate_um_export_from_pms.py --output-dir=/opt/app.dist --include-python-plugin-directory=requests --include-python-plugin-directory=urllib3 --include-python-plugin-directory=Crypto --include-python-plugin-directory=dns --include-python-static-data=ateme/um_backend/api --include-python-static-data=ateme/um_backend/migration_files --include-python-static-data=ateme/um_backend/sync_schema --include-python-static-data=ateme/updater/definitions --include-python-static-data=Crypto/Cipher

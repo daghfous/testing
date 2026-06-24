@@ -1,0 +1,22 @@
+type: object
+required:
+  - prefix
+  - url
+properties:
+  prefix:
+    $ref: 'prefix.yaml'
+  url:
+    type: string
+    description: URL of the API endpoint.
+    example: /api_descriptor
+  scopes:
+    type: array
+    description: List of scopes associated with this API descriptor.
+    items:
+      $ref: 'scope.yaml'
+  actions:
+    type: array
+    description: List of actions associated with this API descriptor.
+    items:
+      $ref: 'action.yaml'
+

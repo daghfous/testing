@@ -1,0 +1,255 @@
+{{ template "chart.header" . }}
+
+![Helm](https://img.shields.io/badge/Helm-3.0-0F1689.svg?logo=helm&logoColor=ffffff)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-1.23-326DE6.svg?logo=kubernetes&logoColor=ffffff)
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [User Management overview](#user-management-overview)
+- [Deploying the application](#deploying-the-application)
+  - [Prerequisites](#prerequisites)
+    - [Installed kubernetes cluster](#installed-kubernetes-cluster)
+    - [Helm (v3) installed on your kubernetes cluster](#helm-v3-installed-on-your-kubernetes-cluster)
+  - [Deploying the application](#deploying-the-application-1)
+    - [Deploy the application](#deploy-the-application)
+    - [Check User Management deployment](#check-user-management-deployment)
+  - [Removing the application](#removing-the-application)
+  - [Upgrading the application](#upgrading-the-application)
+  - [Using the frontend](#using-the-frontend)
+    - [Important information for Frontend deployment](#important-information-for-frontend-deployment)
+- [Values](#values)
+- [Useful commands](#useful-commands)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## User Management overview
+
+The objective of the User Management Micro-services is to manage the users of a complete micro-services product.
+
+## Deploying the application
+
+### Prerequisites
+Find below the requirements for deploying the application on a Kubernetes cluster.
+
+#### Installed kubernetes cluster
+You must have a kubernetes v1.20 cluster installed. If you do not have it yet, follow the provided [Kubernetes Deployment guide by DevOps team](https://myateme.atlassian.net/wiki/spaces/DEVOPS/pages/1446183131/Using+Cloud+Deployer).
+
+#### Helm (v3) installed on your kubernetes cluster
+you must have the helm packager installed on your k8s cluster.
+
+### Deploying the application
+
+**Requirements:** Client tools `kubectl` and `helm` should be installed.
+
+There are 2 ways to deploy:
+- Get the charts from `hub-release.ateme.net`, copy them to the cluster and launch them with `helm install`
+- Clone the repo on your local machine and then specify the kubeconfig to use
+- Mongodb instance deploy, you can deploy mongodb chart with the following commands:
+
+```bash
+helm repo add mongodb https://hub-release.ateme.net/chartrepo/mongodb
+helm install \
+  -n mongo \
+  --create-namespace \
+  mongo \
+  mongodb/mongodb \
+  --version 16.0.3-1 \
+  --set="mongodb.replicaCount=1" \
+  --set="mongodb.metrics.enabled=false" \
+  --set="mongodb.persistence.enabled=false"
+```
+
+Copy the DNS name from NOTES.txt output, by example: `mongo-mongodb-0.mongo-mongodb-headless.mongo.svc.cluster.local:27017`, this will be needed during user-management chart deployment.
+
+
+#### Deploy the application
+
+To deploy the application, you must run the following command:
+
+```bash
+release_name=user-management
+namespace=ateme
+helm install $release_name --namespace=$namespace --create-namespace . --set="global.database.remote.url=mongodb://mongo-mongodb-0.mongo-mongodb-headless.mongo.svc.cluster.local:27017" --set "global.database.incluster=false"
+```
+
+```bash
+NAME: user-management-ateme
+LAST DEPLOYED: Thu Nov  4 18:04:58 2021
+NAMESPACE: user-management-ateme
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Get the URL of the User Management UI by running the following commands:
+  export HOST=$(kubectl get ingress user-management-ateme-ingress --namespace user-management-ateme -o jsonpath="{.status.loadBalancer.ingress}" | sed -E 's/.*(hostname|ip):([^],]*).*/\2/')
+  echo http://$HOST/user-management-ateme
+  echo https://$HOST/user-management-ateme
+
+2. Get the URL of the User Management API by running the following commands:
+  export INGRESS_IP=$(kubectl get ingress user-management-ateme-ingress --namespace user-management-ateme -o jsonpath="{.status.loadBalancer.ingress}" | sed -E 's/.*(hostname|ip):([^],]*).*/\2/')
+  echo http://$HOST/user-management-ateme/api
+  echo https://$HOST/user-management-ateme/api
+```
+
+`--create-namespace` option is only to place when namespace hasn't been already declared.
+You can customize `release_name`and `namespace` variable. You can add `--wait` in order to wait until all services ready.
+
+#### Check User Management deployment
+
+Check the deployment with the following command:
+```bash
+kubectl --namespace $namespace get deployments
+```
+
+```bash
+NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+user-management-ateme-frontend                1/1     1            1           67s
+user-management-ateme-usermanagement          1/1     1            1           67s
+```
+
+In order to check all application services are running correctly, run:
+
+```bash
+kubectl --namespace $namespace get pods
+```
+
+```bash
+NAME                                                            READY   STATUS    RESTARTS   AGE
+user-management-ateme-frontend-6df67dd88c-fb6nt               1/1     Running   0          2m3s
+user-management-ateme-usermanagement-ddc54b9bb-zjswr          1/1     Running   2          2m3s
+```
+
+Finally, check that there are services defined for all deployments:
+
+```bash
+kubectl --namespace $namespace get svc
+```
+
+```bash
+NAME                                            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+user-management-ateme-frontend                ClusterIP   10.233.14.244   <none>        2525/TCP            2d18h
+user-management-ateme-usermanagement          ClusterIP   10.233.36.133   <none>        2529/TCP            2d18h
+```
+
+### Removing the application
+
+To entirely clean up your deployment, run the following command:
+
+```bash
+helm delete $project --namespace $namespace
+```
+
+```bash
+release "user-management-ateme" uninstalled
+```
+
+After removal, make sure that there are no remaining deployments/pods:
+```bash
+kubectl --namespace $namespace get all
+```
+
+```bash
+No resources found in user-management-ateme namespace.
+```
+
+### Upgrading the application
+
+We don't have an upgrade process yet. TODO define a procedure.
+
+### Using the frontend
+
+You can access to frontend behind `http://$HOST/<release-name>`, host being the ingress host.
+
+A detailed documentation on how to use the frontend can be found here :
+[//]: # (TO BE DEFINED)
+
+#### Important information for Frontend deployment
+
+If you are planning to deploy different instances of the application (in Standalone mode - outside of PMF), you need to specify an unique identifier for each instance.
+To do so, you must add the variable `APP_ID` in the `values.yaml` file under the path `frontend.extraEnvVars`:
+```yaml
+frontend:
+  extraEnvVars:
+  - name: APP_ID
+    value: "<GENESIS_1_ID>"
+```
+
+{{ template "chart.valuesSection" . }}
+
+**(1)** Avoid adding default actions and scopes when `auth-loader` is used because they could be conflicting.
+If it is still necessary, make sure they have different prefixes.
+
+This secret will be mounted as volume in the User Management Backend.
+
+Actions, scopes, users and admin must be in separated files.
+
+The expected secret data-model is:
+```yaml
+DEFAULT_ACTIONS: |  # static key for actions filename in the secret
+  [
+    {
+      "name": "get_ping",
+      "prefix": "test",
+      "description": "Get ping",
+      "label": "Get ping",
+      "request": {
+        "method": "GET",
+        "route": "/ping"
+      }
+    },
+    ...
+    {
+      others actions
+    }
+  ]
+DEFAULT_SCOPES: |   # static key for scopes filename in the secret
+  [
+    {
+        "id": "test:operator",
+        "label": "Test",
+        "default": True,
+        "content": [
+          {
+            "action": "test:get_ping",
+            "policy": "allow",
+            "resource": {}
+          }
+        ],
+        "title": "Test operator",
+        "description": "Scope operator for testing purpose"
+    },
+    ...
+    {
+      others scopes
+    }
+  ]
+DEFAULT_USERS: |  # static key for users filename in the secret
+  [
+    {
+      "username": "A user",
+      "password": "its_password",
+      "scopes": [
+          "test:operator"
+      ]
+    },
+    ...
+    {
+      others users
+    }
+  ]
+DEFAULT_ADMIN: |  # static key for admin filename in the secret
+  {
+    "username": "The admin",
+    "password": "its_password",
+  }
+```
+
+
+## Useful commands
+There is a list of commands that may be useful in order to retrieve information from kubernetes services:
+
+- `kubectl --namespace $namespace logs -f <pod_id>`: display the logs of the pod you want to debug. The pod id can be retrieved from `kubect --namespace $namespace get po`.
+<br/>*Example*: `kubectl --namespace ateme logs -f user-management-ateme-api-5f546c9946-l58qg`
+
+- `kubectl --namespace $namespace describe {pod, service, deployment} <id>`: displays different kind of information abourt pod/service/deployment you want to check. By example you can check the image used by a pod.
+<br/>*Example*: `kubect --namespace ateme describe pod user-management-ateme-api-5f546c9946-l58qg`

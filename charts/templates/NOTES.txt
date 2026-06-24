@@ -1,0 +1,19 @@
+{{- if (coalesce .Values.frontend.enabled) }}
+1. Get the URL of the User Management UI by running the following commands:
+  export HOST=$(kubectl get ingress {{ .Release.Name }}-ingress --namespace {{ .Release.Namespace }} -o jsonpath="{.status.loadBalancer.ingress}" | sed -E 's/.*(hostname|ip):([^],]*).*/\2/')
+  echo http://$HOST/{{ .Release.Name }}/user
+  echo https://$HOST/{{ .Release.Name }}/user
+
+{{- else }}
+1. 🚨 User Management Frontend is disabled 🚨
+
+{{- end }}
+
+{{- if (coalesce .Values.backend.enabled) }}
+2. Get the URL of the User Management API by running the following commands:
+  export HOST=$(kubectl get ingress {{ .Release.Name }}-ingress --namespace {{ .Release.Namespace }} -o jsonpath="{.status.loadBalancer.ingress}" | sed -E 's/.*(hostname|ip):([^],]*).*/\2/')
+  echo http://$HOST/{{ .Release.Name }}/users
+  echo https://$HOST/{{ .Release.Name }}/users
+{{- else }}
+2. 🚨 User Management API is disabled 🚨
+{{- end }}

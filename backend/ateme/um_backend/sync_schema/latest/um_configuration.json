@@ -1,0 +1,14 @@
+{
+  "title": "Failover synchronization schema for collection configuration of User Management for version latest",
+  "component": "user-management",
+  "collection": "configuration",
+  "version": "latest",
+  "import_policy": {
+    "conflict_management": "override",
+    "key_index": []
+   },
+  "export_policy": {
+    "filters": {},
+    "fields": {"_id": 0}
+  }
+}

@@ -1,0 +1,5 @@
+title: scope identifier
+description: This field is used to identified the scope
+type: string
+pattern: '^([a-z0-9]([-a-z0-9]*[a-z0-9])?|[a-z0-9]([-a-z0-9]*[a-z0-9])?:[a-z0-9]{3,10}|^[a-z0-9]{3,10}):(([a-z_]{1,}|[\*]|[a-z0-9]{3,10}:([a-z0-9_+]{1,}|[\*]))|([a-z0-9_+]{1,}|[\*]))$'
+example: "'ala:administrator' or 'app-name:administrator' or 'app-name:ala:administrator'"

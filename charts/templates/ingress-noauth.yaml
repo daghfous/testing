@@ -1,0 +1,129 @@
+{{- if and .Values.ingress.enabled .Values.frontend.enabled }}
+{{- $ingressPath := .Values.frontend.ingress.noauth.path -}}
+{{- $ingressPathType := .Values.frontend.ingress.noauth.pathType -}}
+{{- $extraPaths := .Values.frontend.ingress.noauth.extraPaths -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-umingress-no-auth-frontend
+  annotations:
+    {{- with .Values.frontend.ingress.noauth.annotations }}
+      {{- range $key, $value := . }}
+        {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+    {{- end }}
+    {{- with .Values.frontend.ingress.noauth.additionalAnnotations }}
+      {{- range $key, $value := . }}
+        {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+    {{- end }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  ingressClassName: {{ tpl .Values.frontend.ingress.noauth.class . }}
+  {{- if $tls := .Values.frontend.ingress.noauth.tls }}
+  tls:
+{{ tpl (toYaml $tls) . | indent 4 }}
+  {{- end }}
+  rules:
+  - http:
+      paths:
+        {{- with $extraPaths }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        - path: {{ tpl $ingressPath $ }}
+          pathType: {{ $ingressPathType }}
+          backend:
+            service:
+              name: {{ template "um.frontend.fullname" . }}
+              port:
+                number: {{ .Values.frontend.service.ports.http }}
+    {{- if .Values.frontend.ingress.noauth.hostname }}
+    host: {{ tpl .Values.frontend.ingress.noauth.hostname . | quote }}
+    {{- end }}
+  {{- range .Values.frontend.ingress.noauth.extraHosts }}
+  - host: {{ tpl .name $ | quote }}
+    http:
+      paths:
+        {{- with $extraPaths }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        - path: {{ tpl $ingressPath $ }}
+          pathType: {{ $ingressPathType }}
+          backend:
+            service:
+              name: {{ template "um.frontend.fullname" $ }}
+              port:
+                number: {{ $.Values.frontend.service.ports.http }}
+  {{- end }}
+{{- end }}
+---
+{{ if and .Values.ingress.enabled .Values.backend.enabled }}
+{{- $ingressPath := .Values.backend.ingress.noauth.path -}}
+{{- $ingressPathType := .Values.backend.ingress.noauth.pathType -}}
+{{- $extraPaths := .Values.backend.ingress.noauth.extraPaths -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-umingress-no-auth
+  annotations:
+    {{- with .Values.backend.ingress.noauth.annotations }}
+      {{- range $key, $value := . }}
+        {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+    {{- end }}
+    {{- with .Values.backend.ingress.noauth.additionalAnnotations }}
+      {{- range $key, $value := . }}
+        {{ $key }}: {{ tpl $value $ | quote }}
+      {{- end }}
+    {{- end }}
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  ingressClassName: {{ tpl .Values.backend.ingress.noauth.class . }}
+  {{- if $tls := .Values.backend.ingress.noauth.tls }}
+  tls:
+{{ tpl (toYaml $tls) . | indent 4 }}
+  {{- end }}
+  rules:
+  - http:
+      paths:
+        {{- with $extraPaths }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        - path: {{ tpl $ingressPath $ }}
+          pathType: {{ $ingressPathType }}
+          backend:
+            service:
+              name: {{ template "um.backend.fullname" . }}
+              port:
+                number: {{ .Values.backend.service.ports.http }}
+    {{- if .Values.backend.ingress.noauth.hostname }}
+    host: {{ tpl .Values.backend.ingress.noauth.hostname . | quote }}
+    {{- end }}
+  {{- range .Values.backend.ingress.noauth.extraHosts }}
+  - host: {{ tpl .name $ | quote }}
+    http:
+      paths:
+        {{- with $extraPaths }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        - path: {{ tpl $ingressPath $ }}
+          pathType: {{ $ingressPathType }}
+          backend:
+            service:
+              name: {{ template "um.backend.fullname" $ }}
+              port:
+                number: {{ $.Values.backend.service.ports.http }}
+  {{- end }}
+{{ end }}

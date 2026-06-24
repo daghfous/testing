@@ -1,0 +1,10 @@
+version: '2.1'
+
+services:
+  user-management-ms:
+    image: ${hub}/user-management-ms/frontend:${version}
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - '2525:80'

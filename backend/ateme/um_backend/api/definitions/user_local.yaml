@@ -1,0 +1,59 @@
+type: object
+additionalProperties: false
+required:
+  - username
+  - password
+properties:
+  username:
+    type: string
+    title: user username
+    description: Unique username used for authentication.
+    example: demo.user
+    minLength: 3
+  password:
+    $ref: 'password.yaml'
+  enabled:
+    type: boolean
+    description: Flag indicating if the user is enabled or not.
+    example: true
+    default: true
+  scopes:
+    type: array
+    title: user scopes
+    description: Scopes assigned to the user, used for authorization.
+    items:
+      $ref: 'scope_id.yaml'
+  authenticate_mode:
+    type: string
+    title: authenticate mode
+    deprecated: true
+  level:
+    type: integer
+    minimum: 0
+    description: User level
+    example: 1
+  first_login:
+    type: boolean
+    description: Flag indicating if it's the user's first login.
+    example: true
+  password_expired:
+    type: boolean
+    description: Flag indicating if the password has expired or not.
+    default: false
+    example: false
+  session_timeout_disabled:
+    type: boolean
+    default: false
+    example: false
+    description: Flag to disable session timeout for the user.
+  internal:
+    type: boolean
+    default: false
+    example: false
+    description: Flag indicating if the user is internal or not.
+  password_expiration_disabled:
+    title: Disable Password Expiration Flag
+    description: Flag to disable password expiration for the user.
+    default: false
+    example: false
+    type: boolean

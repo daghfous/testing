@@ -1,0 +1,41 @@
+type: object
+additionalProperties: false
+description: User authenticated via LDAP, used for authentication
+required:
+  - username
+  - idp_name
+properties:
+  username:
+    type: string
+    title: user username
+    description: Username of the user, used for authentication and display in frontend
+    example: ldap.user
+    minLength: 3
+  enabled:
+    type: boolean
+    default: true
+    description: Flag indicating if the user is enabled or not. Disabled users cannot authenticate.
+    example: true
+  scopes:
+    type: array
+    title: user scopes
+    description: Scopes assigned to the user, used for authorization
+    items:
+      $ref: 'scope_id.yaml'
+  idp_name:
+    description: Identity provider name used for authentication, must be different from 'local' which is reserved for local users
+    example: corp-ldap
+    type: string
+    not:
+      enum:
+        - 'local'
+  level:
+    description: User level, used for display in frontend and for future use in authorization
+    example: 1
+    type: integer
+    minimum: 0
+  session_timeout_disabled:
+    description: Flag to disable session timeout for the user
+    type: boolean
+    default: false
+    example: false

@@ -1,0 +1,39 @@
+suite: OpenShift Compatibility Test - Auth-Controller
+templates:
+  - ../templates/auth-controller/deployment.yaml
+tests:
+  - it: should remove OpenShift-incompatible securityContext fields in force mode
+    set:
+        global.compatibility.openshift.adaptSecurityContext: force
+        authcontroller.enabled: true
+    asserts:
+      # SecurityContext exists
+      - exists:
+          path: spec.template.spec.securityContext
+      - exists:
+          path: spec.template.spec.containers[0].securityContext
+      # Pod-level fields removed
+      - notExists:
+          path: spec.template.spec.securityContext.fsGroup
+      - notExists:
+          path: spec.template.spec.securityContext.runAsUser
+      - notExists:
+          path: spec.template.spec.securityContext.runAsGroup
+      # Container-level fields removed
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.runAsUser
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext.runAsGroup
+      # Container-level compatible fields remain
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.runAsNonRoot
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.capabilities.drop[0]
+          value: ALL

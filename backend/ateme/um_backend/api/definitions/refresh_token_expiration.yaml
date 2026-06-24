@@ -1,0 +1,6 @@
+title: refresh token expiration
+description: "Expiration period (in seconds) for the refresh token"
+type: integer
+default: 7200
+minimum: 5
+example: 7200

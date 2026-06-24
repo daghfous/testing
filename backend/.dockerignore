@@ -1,0 +1,10 @@
+.tox
+.coverage
+Dockerfile
+.env
+.gitignore
+.pylintrc
+README.md
+docker-compose.yaml
+requirements-test.*
+tox.ini

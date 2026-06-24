@@ -1,0 +1,182 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "um.backend.fullname" . }}
+  labels:
+    app: {{ template "um.backend.fullname" . }}
+    # Need for debug_package
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ template "um.backend.replicas" . }}
+  strategy: {{- toYaml .Values.backend.updateStrategy | nindent 4 }}
+  selector:
+    matchLabels:
+      app: {{ template "um.backend.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "um.backend.fullname" . }}
+        # Need for debug_package
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.Version }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        {{- if $podLabels := .Values.backend.podLabels }}
+        {{ include "tplvalues.render" (dict "value" $podLabels "context" $) | nindent 8 | trim }}
+        {{- end }}
+    spec:
+      automountServiceAccountToken: false
+      {{- if .Values.global.registry.private }}
+      imagePullSecrets:
+        - name: {{ template "um.secrets.registrycredentials.name" . }}
+      {{- end }}
+      volumes:
+        - name: tmp-dir
+        {{- if .Values.database.certificate.enabled }}
+        - name: um-dbcerts-volume
+          secret:
+            secretName: {{ .Values.database.certificate.secretName }}
+        {{- end }}
+        {{- if .Values.backend.defaultValuesSecretName }}
+        - name: default-values-secret
+          secret:
+            secretName: "{{ tpl .Values.backend.defaultValuesSecretName . }}"
+            optional: true
+        {{- end }}
+      {{- if .Values.backend.podSecurityContext.enabled }}
+      securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.backend.podSecurityContext "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.global.registry.address }}/{{ .Values.global.registry.folderName }}{{ not .Values.global.registry.folderName | ternary "" "/" }}{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.global.system.images.pullPolicy }}
+        {{- if .Values.backend.containerSecurityContext.enabled }}
+        securityContext: {{- include "common.compatibility.renderSecurityContext" (dict "secContext" .Values.backend.containerSecurityContext "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          limits:
+            cpu: {{ .Values.backend.resources.limits.cpu }}
+            memory: {{ .Values.backend.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.backend.resources.requests.cpu }}
+            memory: {{ .Values.backend.resources.requests.memory }}
+        env:
+          - name: "LDAP_LOG_DETAIL_LEVEL"
+            value: "{{ .Values.backend.ldapLogDetailLevel }}"
+          - name: "LDAP_NETWORK_TIMEOUT"
+            value: "{{ .Values.backend.ldapNetworkTimeout }}"
+          - name: "LOGLEVEL"
+            value: "{{ .Values.backend.logLevel }}"
+          - name: "UM_API_PORT"
+            value: "{{ .Values.backend.containerPorts.http }}"
+          {{- if .Values.global.database.incluster }}
+          - name: "UM_DATABASE_URL"
+            value: "{{ tpl .Values.database.url . }}"
+          {{- else }}
+          - name: "UM_DATABASE_URL"
+            value: "{{ tpl .Values.global.database.remote.url . }}"
+          {{- end }}
+          - name: "UM_DATABASE_NAME"
+            value: {{ template "um.backend.databaseName" . }}
+          - name: "DEPLOYING_WITH_PMF"
+            value: "{{ .Values.global.system.application.deployingWithPfs }}"
+          - name: RELEASE_NAME
+            value: "{{ .Release.Name }}"
+          - name: "EXECUTOR_MAX_WORKERS"
+            value: "{{ .Values.backend.maxWorkers }}"
+          - name: "LDAP_SYNC_PERIOD"
+            value: "{{ .Values.backend.ldapSyncPeriod }}"
+          - name: "UM_TOKEN_IP_VALIDATION" # sensitiveContainerEnvVar from Polaris report, but don't change because is used by external products
+            value: "{{ .Values.backend.tokenIpValidation }}"
+          {{- if .Values.backend.defaultValuesSecretName }}
+          - name: "DEFAULT_ACTIONS_PATH"
+            value: "/ateme/umbackend/config/DEFAULT_ACTIONS"
+          - name: "DEFAULT_SCOPES_PATH"
+            value: "/ateme/umbackend/config/DEFAULT_SCOPES"
+          - name: "DEFAULT_USERS_PATH"
+            value: "/ateme/umbackend/config/DEFAULT_USERS"
+          - name: "DEFAULT_ADMIN_PATH"
+            value: "/ateme/umbackend/config/DEFAULT_ADMIN"
+          {{- end }}
+          {{- if .Values.database.certificate.enabled }}
+          - name: "MONGO_TLS_CERT_PATH"
+            value: "/etc/certs/db-target/{{ .Values.database.certificate.name}}"
+          {{- end}}
+          - name: "SCOPES_PAGE_LIMIT"
+            value: "{{ .Values.backend.scopesPageLimit }}"
+        ports:
+          - name: http
+            containerPort: {{ .Values.backend.containerPorts.http }}
+            protocol: TCP
+        {{- if .Values.backend.customLivenessProbe }}
+        livenessProbe: {{- include "tplvalues.render" (dict "value" .Values.backend.customLivenessProbe "context" $) | nindent 10 }}
+        {{- else if .Values.backend.livenessProbe.enabled }}
+        livenessProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.backend.livenessProbe "enabled") "context" $) | nindent 10 }}
+          httpGet:
+            path: /ping
+            port: http
+        {{- end }}
+        {{- if .Values.backend.customReadinessProbe }}
+        readinessProbe: {{- include "tplvalues.render" (dict "value" .Values.backend.customReadinessProbe "context" $) | nindent 10 }}
+        {{- else if .Values.backend.readinessProbe.enabled }}
+        readinessProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.backend.readinessProbe "enabled") "context" $) | nindent 10 }}
+          httpGet:
+            path: /readiness
+            port: http
+        {{- end }}
+        {{- if .Values.backend.customStartupProbe }}
+        startupProbe: {{- include "tplvalues.render" (dict "value" .Values.backend.customStartupProbe "context" $) | nindent 10 }}
+        {{- else if .Values.backend.startupProbe.enabled }}
+        startupProbe: {{- include "tplvalues.render" (dict "value" (omit .Values.backend.startupProbe "enabled") "context" $) | nindent 10 }}
+          tcpSocket:
+            port: http
+        {{- end }}
+        volumeMounts:
+          - name: tmp-dir
+            # To create temporary file for api_definition
+            mountPath: /tmp
+          {{- if .Values.database.certificate.enabled }}
+          - name: um-dbcerts-volume
+            mountPath: "/etc/certs/db-target"
+          {{- end }}
+          {{- if .Values.backend.defaultValuesSecretName }}
+          - name: default-values-secret
+            mountPath: "/ateme/umbackend/config"
+            readOnly: true
+          {{- end }}
+    {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      affinity:
+      {{- if eq .Values.global.app.configuration.mode "HA" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - {{ template "um.backend.fullname" . }}
+              topologyKey: "kubernetes.io/hostname"
+      {{- end }}
+      {{- with .Values.backend.nodeAffinity }}
+        nodeAffinity:
+{{ toYaml . | indent 10 }}
+      {{- end }}
+    {{- with .Values.backend.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- if .Values.backend.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "tplvalues.render" (dict "value" .Values.backend.topologySpreadConstraints "context" .) | nindent 8 }}
+    {{- end }}
+{{- end }}

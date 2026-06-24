@@ -1,0 +1,11 @@
+type: object
+additionalProperties: false
+required:
+  - api_url
+properties:
+  api_url:
+    type: string
+    description: This param is the address of the k8s service which serves the OpenAPI definition |
+      and is required in auth controller + product use cases
+example:
+  api_url: http://auth-controller.user-management.svc.cluster.local:8080

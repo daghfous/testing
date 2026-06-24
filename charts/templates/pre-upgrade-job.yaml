@@ -1,0 +1,126 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-pre-upgrade-job"
+  labels:
+    app: {{ template "um.backend.fullname" . }}
+    # Need for debug_package
+    release: {{ .Release.Name }}
+    app.kubernetes.io/component: pre-upgrade-job
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.Version }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    # Here we set the Helm Hook on "pre-upgrade" to execute on an upgrade request
+    # after templates are rendered, but before any resources are loaded into Kubernetes
+    "helm.sh/hook": pre-upgrade
+    # We can delete the hook after the hook is successfully executed, if the hook failed during execution
+    # and delete the previous hook before the new hook is launched
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}-pre-upgrade-job"
+      labels:
+        release: {{ .Release.Name }}
+        app.kubernetes.io/component: pre-upgrade-job
+        app.kubernetes.io/name: {{ .Chart.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.Version }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        {{- if $podLabels := .Values.preUpgradeJob.podLabels }}
+        {{ include "tplvalues.render" (dict "value" $podLabels "context" $) | nindent 8 | trim }}
+        {{- end }}
+    spec:
+      {{- if .Values.global.registry.private }}
+      imagePullSecrets:
+        - name: {{ template "um.secrets.registrycredentials.name" . }}
+      {{- end }}
+      automountServiceAccountToken: {{ .Values.preUpgradeJob.automountServiceAccountToken }}
+      serviceAccountName: {{ .Release.Name }}-pre-upgrade-serviceaccount
+      restartPolicy: OnFailure
+      {{- if .Values.backend.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.backend.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .Values.preUpgradeJob.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.preUpgradeJob.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+      - name: copy-kubectl
+        image: "{{ .Values.global.registry.address }}/{{ .Values.global.registry.folderName }}{{ not .Values.global.registry.folderName | ternary "" "/" }}{{ .Values.preUpgradeJob.image.repository }}:{{ .Values.preUpgradeJob.image.tag }}"
+        command:
+          - sh
+          - -c
+          - |
+            cp /usr/local/bin/kubectl /script
+            cp /bin/sh /script
+        {{- if .Values.backend.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.backend.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+          - name: script
+            mountPath: /script
+        resources:
+          limits:
+            cpu: {{ .Values.preUpgradeJob.resources.limits.cpu }}
+            memory: {{ .Values.preUpgradeJob.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.preUpgradeJob.resources.requests.cpu }}
+            memory: {{ .Values.preUpgradeJob.resources.requests.memory }}
+      containers:
+      - name: {{ .Release.Name }}-pre-upgrade-job
+        image: "{{ .Values.global.registry.address }}/{{ .Values.global.registry.folderName }}{{ not .Values.global.registry.folderName | ternary "" "/" }}{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.global.system.images.pullPolicy }}
+        resources:
+          limits:
+            cpu: {{ .Values.preUpgradeJob.resources.limits.cpu }}
+            memory: {{ .Values.preUpgradeJob.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.preUpgradeJob.resources.requests.cpu }}
+            memory: {{ .Values.preUpgradeJob.resources.requests.memory }}
+        volumeMounts:
+          - name: script
+            mountPath: /script
+        {{- if .Values.backend.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.backend.containerSecurityContext "enabled" | toYaml | nindent 10 }}
+        {{- end }}
+        env:
+        {{- if .Values.global.database.incluster }}
+        - name: "UM_DATABASE_URL"
+          value: "{{ tpl .Values.database.url . }}"
+        {{- else }}
+        - name: "UM_DATABASE_URL"
+          value: "{{ tpl .Values.global.database.remote.url . }}"
+        {{- end }}
+        - name: "UM_DATABASE_NAME"
+          value: {{ template "um.backend.databaseName" . }}
+        command:
+        - /script/sh
+        - -c
+        - |
+          # Check if the upgrade is required
+          check-upgrade
+          exit_code=$?
+          echo "check-upgrade returns $exit_code"
+          if [ $exit_code -eq 0 ] ; then
+            echo "An upgrade is needed."
+            # Delete deployment
+            /script/kubectl get deployment --namespace={{ .Release.Namespace }} {{ .Release.Name }}-umbackend
+            if [ $? -eq 0 ]; then
+              /script/kubectl delete deployment --namespace={{ .Release.Namespace }} {{ .Release.Name }}-umbackend
+            fi
+            # Upgrade DB
+            upgrade
+            echo "Upgrade done"
+          else
+            echo "None upgrade needed"
+          fi
+      volumes:
+      - name: script
+        emptyDir: {}

@@ -1,0 +1,14 @@
+{
+  "title": "Migration schema for collection configuration of User Management for version 4.0",
+  "component": "user-management",
+  "collection": "configuration",
+  "version": "4.0",
+  "import_policy": {
+    "conflict_management": "override",
+    "key_index": []
+   },
+  "export_policy": {
+    "filters": {},
+    "fields": {"_id": 0}
+  }
+}

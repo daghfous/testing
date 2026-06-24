@@ -1,0 +1,10 @@
+type: object
+title: Refresh token
+required:
+  - refresh_token
+properties:
+  refresh_token:
+    type: string
+    title: refresh token
+example:
+  refresh_token: "<REFRESH_TOKEN>"

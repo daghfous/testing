@@ -1,0 +1,16 @@
+type: object
+properties:
+  token:
+    type: array
+    description: User access token, useful with old reverse-proxy. In other case token is forwarded via header `Authorization`.
+    example: ["<ACCESS_TOKEN>"]
+  uri:
+    type: array
+    description: Original uri request, useful with old reverse-proxy. In other case uri is forwarded via header `X-Original-URI`.
+    deprecated: true
+    example: ["/users/local/demo.user"]
+  method:
+    type: array
+    description: Original method request, useful with old reverse-proxy. In other case method is forwarded via header `X-Original-Method`.
+    deprecated: true
+    example: ["GET"]

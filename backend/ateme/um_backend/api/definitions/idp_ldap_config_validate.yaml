@@ -1,0 +1,30 @@
+title: idp ldap config structure.
+description: This data structure describe the ldap_config format exposed by the API.
+allOf:
+  - type: object
+    required:
+      - idp_label
+      - server
+      - search
+      - group
+      - username
+      - password
+  - anyOf:
+    - $ref: './idp_ldap_config.yaml'
+    - type: object
+      properties:
+        username:
+          type: string
+          description: The username for LDAP authentication
+        password:
+          type: string
+          description: The password for LDAP authentication
+example:
+  idp_type: ldap
+  idp_name: corp-ldap
+  idp_label: Corporate LDAP
+  server: ldap.example.com
+  search: dc=example,dc=com
+  group: cn
+  username: test.user
+  password: "<PASSWORD>"

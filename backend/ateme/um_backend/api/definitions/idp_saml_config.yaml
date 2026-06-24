@@ -1,0 +1,86 @@
+title: Idp saml config structure.
+description: This data structure describe the saml_config format exposed by the API.
+type: object
+additionalProperties: false
+required:
+  - idp_type
+properties:
+  idp_type:
+    title: The type of the Identity Provider
+    $ref: './idp_type.yaml'
+    enum:
+      - saml
+  entity_id:
+    title: Identifier of the IdP entity (usually an url)
+    type: string
+  idp_name:
+    $ref: './idp_unique_name.yaml'
+  single_sign_on_service:
+    title: Idp url used to sign on
+    type: string
+    description: URL Target of the IdP where the Authentication Request Message will be sent
+  single_logout_service:
+    title: Idp url used to logout
+    type: string
+    description: URL Location where the Logout Request from the IdP will be sent
+  cert_fingerprint:
+    title: Public certificate of the IdP
+    type: string
+    description: Public certificate of the IdP
+  idp_label:
+    $ref: './idp_label.yaml'
+  sign_authn_request:
+    type: boolean
+    default: false
+    description: Determine whether the authentication request will be signed.
+  sign_logout_request:
+    type: boolean
+    default: false
+    description: Determine whether the logout request will be signed.
+  sp_public_cert:
+    title: Public certificate of the SP
+    type: string
+    description: Public certificate of the SP
+  sp_private_cert:
+    title: Private certificate of the SP
+    type: string
+    description: Private certificate of the SP
+  deny_access:
+    type: boolean
+    default: true
+    description: Specify whether the connecting user will be denied access if it matches no mapper. If True and the user already exists, clears its scopes.
+  scopes:
+    type: array
+    title: user scopes
+    items:
+      $ref: 'scope_id.yaml'
+    description: Scopes (roles) that users must be associated with. Default value is all:guest
+  automatically_add_user:
+    deprecated: true
+    type: boolean
+    default: true
+    description: |
+      DEPRECATED This boolean parameter is used to automatically
+      create users and associate scopes on their first connection.
+  mappers:
+    type: array
+    title: idp mappers
+    items:
+      type: object
+      anyOf:
+        - $ref: 'direct_mapper.yaml'
+        - $ref: 'simple_mapper.yaml'
+      discriminator:
+        propertyName: type
+        mapping:
+          direct: 'direct_mapper.yaml'
+          simple: 'simple_mapper.yaml'
+    description: Mappers to determine which roles to assign when a user is logging
+example:
+  idp_type: saml
+  idp_name: corp-saml
+  idp_label: Corporate SSO
+  entity_id: https://idp.example.com/metadata
+  single_sign_on_service: https://idp.example.com/sso
+  single_logout_service: https://idp.example.com/logout
+  cert_fingerprint: "<CERTIFICATE_FINGERPRINT_SHA1>"

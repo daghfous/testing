@@ -1,9 +1,18 @@
 import axios, { AxiosHeaders, AxiosInstance, CreateAxiosDefaults } from 'axios'
 
 import tokenService from '../services/TokenService'
-import EnvService from '@ateme/cathodic-ui/src/services/EnvService.ts'
 
-const userRootPath: string = EnvService.getInstance().getEnv('USER_MANAGEMENT_URL') || 'users/'
+// Use window.__envConfig which is loaded synchronously in index.html
+// This avoids the async timing issue with EnvService.initConfigMap()
+declare global {
+  interface Window {
+    __envConfig: Record<string, any>
+  }
+}
+
+const getUserRootPath = (): string => {
+  return window.__envConfig?.USER_MANAGEMENT_URL || 'users/'
+}
 
 // base config for axios clients
 const clientConfig = {
@@ -31,6 +40,11 @@ const createClient = (path: string): AxiosInstance => {
   return axios.create({ baseURL: path, ...clientConfig } as CreateAxiosDefaults)
 }
 
+// Create usersClient with the user root path
+// Note: This will use the current value from EnvService at the time of client creation
 export const TIMEOUT: number = 5000
 export const LOGIN_TIMEOUT: number = 10000
+
+// Get the user root path and create the client
+const userRootPath = getUserRootPath()
 export const usersClient: AxiosInstance = createClient(userRootPath)

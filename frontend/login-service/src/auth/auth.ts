@@ -111,7 +111,7 @@ const AuthService = {
     const redirectTo = (path?: string) => {
       Logger.debug(
         'login-service auth.ts > logout > redirectTo',
-        `EnvService.getInstance().getEnv("VITE_TOP_MENU_STATIC_CONFIG") = ${EnvService.getInstance().getEnv('VITE_TOP_MENU_STATIC_CONFIG')}`
+        `window.__envConfig.VITE_TOP_MENU_STATIC_CONFIG = ${(window as any).__envConfig?.VITE_TOP_MENU_STATIC_CONFIG}`
       )
       if (isStandaloneMode) {
         Logger.debug('login-service auth.ts > logout > redirectTo', 'We are in appliance mode')

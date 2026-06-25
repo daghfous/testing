@@ -60,7 +60,8 @@ class TokenService {
   clearStorageAndReload() {
     Logger.debug('login-service TokenService.ts > clearStorageAndReload', `begin`)
     const currentLocation = location.pathname.split('/')[1]
-    const baseUrl = EnvService.getInstance().getEnv('VITE_LOGIN_URL') || `/${currentLocation}`
+    // Use window.__envConfig to avoid async timing issues
+    const baseUrl = (window as any).__envConfig?.VITE_LOGIN_URL || `/${currentLocation}`
     const showAlert = !!AuthStorageService.getFromLocalStorage('currentUserName')
     this.setLastVisitedUrl()
     AuthStorageService.clearAuthAndUserDataFromStorages()

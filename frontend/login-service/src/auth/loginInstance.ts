@@ -2,6 +2,9 @@ import { App } from 'vue'
 import { createPinia, Pinia, storeToRefs } from 'pinia'
 import { Router } from 'vue-router'
 
+// Initialize EnvService before any other imports that might use getEnv()
+import './initEnv'
+
 import { i18n, keyEnUs } from '@ateme/cathodic-ui/src/services/I18nNext'
 import vueUtils from '@ateme/cathodic-ui/src/utils/vueUtils'
 import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'

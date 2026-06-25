@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { notificationStore } from '@ateme/cathodic-ui/src/components/notifications/notificationStore'
-import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'
+import EnvService from '@ateme/cathodic-ui/src/services/EnvService.ts'
 
 import { LOGIN_TIMEOUT } from '../config/api'
 import { IUser } from '../interfaces/Interfaces'
@@ -9,8 +9,7 @@ import tokenService from '../services/TokenService'
 import Logger from '@ateme/cathodic-ui/src/services/Logger.ts'
 import { isStandaloneMode } from '../utils/constants.ts'
 import { getTrueBasePath } from '../utils/Urls.ts'
-import EnvService from '@ateme/cathodic-ui/src/services/EnvService.ts'
-const getRootPath: string = process.env.USER_MANAGEMENT_URL || '/'
+const getRootPath: string = EnvService.getInstance().getEnv('USER_MANAGEMENT_URL') || '/'
 
 const AuthService = {
   login: async (user: IUser, afterLoginSuccessed: () => void): Promise<void> => {
@@ -91,7 +90,7 @@ const AuthService = {
    * @returns {string} - The constructed logout URL
    */
   buildLogoutUrl: (): string => {
-    const baseURL = getEnv('USER_MANAGEMENT_URL')!
+    const baseURL = EnvService.getInstance().getEnv('USER_MANAGEMENT_URL')!
     const relayState = `${window.location.origin}/${getTrueBasePath()}`
     Logger.debug('login-service auth.ts > login', 'Relay state is ' + relayState)
     const url = new URL('logout', window.location.origin + baseURL)

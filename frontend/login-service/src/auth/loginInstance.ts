@@ -1,13 +1,13 @@
+// Initialize EnvService before any other imports that might use getEnv()
+import './initEnv'
+
 import { App } from 'vue'
 import { createPinia, Pinia, storeToRefs } from 'pinia'
 import { Router } from 'vue-router'
 
-// Initialize EnvService before any other imports that might use getEnv()
-import './initEnv'
-
 import { i18n, keyEnUs } from '@ateme/cathodic-ui/src/services/I18nNext'
 import vueUtils from '@ateme/cathodic-ui/src/utils/vueUtils'
-import { getEnv } from '@ateme/cathodic-ui/src/utils/EnvUtils'
+import EnvService from '@ateme/cathodic-ui/src/services/EnvService.ts'
 
 import routerDefinition, { RouterOptions } from './router'
 import { authStore } from './store'
@@ -118,7 +118,7 @@ export default class InitializeLogin {
 
 export const afterLoginSuccessed = (): unknown => {
   const { getProjectInitialize } = useAuth()
-  const topMenuManifestPath = getEnv('VITE_TOP_MENU_MANIFEST_PATH')
+  const topMenuManifestPath = EnvService.getInstance().getEnv('VITE_TOP_MENU_MANIFEST_PATH')
 
   if (topMenuManifestPath) {
     const url = defaultRedirectPath()

@@ -1,3 +1,5 @@
+import EnvService from '@ateme/cathodic-ui/src/services/EnvService.ts'
+
 const AUTH_DATA: string[] = ['sessionToken', 'refreshToken', 'currentUserName']
 const USER_DATA = [
   'currentUserName',
@@ -60,7 +62,7 @@ export default class AuthStorageService {
    * @param {string} value Value of the item to set
    */
   static addToLocalStorage(key: string, value: string | null) {
-    const appId = process.env.APP_ID
+    const appId = EnvService.getInstance().getEnv('APP_ID')
     // When deploying an application in standalone mode, there is no releaseName
     if (appId) localStorage.setItem(`${appId}:${key}`, value as string)
     else localStorage.setItem(key, value as string)
@@ -72,7 +74,7 @@ export default class AuthStorageService {
    * @returns {string} releaseName:key
    */
   static getFromLocalStorage(key: string) {
-    const appId = process.env.APP_ID
+    const appId = EnvService.getInstance().getEnv('APP_ID')
     //If releaseName exists, returns the releaseName:key, otherwise return just key
     return appId ? localStorage.getItem(`${appId}:${key}`) : localStorage.getItem(key)
   }
@@ -82,7 +84,7 @@ export default class AuthStorageService {
    * @param {string} key Key of the item to remove
    */
   static removeFromLocalStorage(key: string) {
-    const appId = process.env.APP_ID
+    const appId = EnvService.getInstance().getEnv('APP_ID')
     if (appId) localStorage.removeItem(`${appId}:${key}`)
     else localStorage.removeItem(key)
   }

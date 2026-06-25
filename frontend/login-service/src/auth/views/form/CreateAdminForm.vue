@@ -278,7 +278,9 @@
       position: relative;
       margin: 16px 8px 8px;
     }
-
+    .login-form-header {
+      text-align: center;
+    }
     .login-form-project-name {
       display: flex;
       justify-content: center;

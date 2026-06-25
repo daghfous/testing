@@ -3,8 +3,6 @@ import axios, { AxiosHeaders, AxiosInstance, CreateAxiosDefaults } from 'axios'
 import tokenService from '../services/TokenService'
 import EnvService from '@ateme/cathodic-ui/src/services/EnvService.ts'
 
-const userRootPath: string = EnvService.getInstance().getEnv('USER_MANAGEMENT_URL') || 'users/'
-
 // base config for axios clients
 const clientConfig = {
   headers: {
@@ -31,6 +29,24 @@ const createClient = (path: string): AxiosInstance => {
   return axios.create({ baseURL: path, ...clientConfig } as CreateAxiosDefaults)
 }
 
+// Export constants
 export const TIMEOUT: number = 5000
 export const LOGIN_TIMEOUT: number = 10000
-export const usersClient: AxiosInstance = createClient(userRootPath)
+
+// Export createClient for dynamic client creation
+export { createClient }
+
+// usersClient will be created after EnvService is initialized
+// This is a getter function to ensure it's created with the correct env values
+let usersClientInstance: AxiosInstance | null = null
+export const getUsersClient = (): AxiosInstance => {
+  if (!usersClientInstance) {
+    const userRootPath = EnvService.getInstance().getEnv('USER_MANAGEMENT_URL') || 'users/'
+    usersClientInstance = createClient(userRootPath)
+  }
+  return usersClientInstance
+}
+
+// For backward compatibility, export usersClient as a getter
+// Note: This will be initialized on first use
+export const usersClient: AxiosInstance = getUsersClient()

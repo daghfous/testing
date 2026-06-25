@@ -50,7 +50,10 @@ export default class InitializeLogin {
   }
 
   start(app: IAppOptions) {
-    return this.createView(app)
+    // Ensure EnvService is initialized before creating the view
+    return EnvService.getInstance().initConfigMap().then(() => {
+      return this.createView(app)
+    })
   }
 
   /**

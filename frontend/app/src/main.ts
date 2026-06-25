@@ -169,6 +169,7 @@ const projectInitialize = () =>
  * Starts the login initialization process with specified configurations.
  * This includes setting the language locale, login options, product logo, project name, and the project initialization function.
  */
+// start() now returns a Promise that resolves when EnvService is initialized
 initializeLogin.start({
   app: ApplicationService.getApp()!,
   productLoginLogo: '',
@@ -178,4 +179,8 @@ initializeLogin.start({
   },
   projectName,
   projectInitialize: projectInitialize
+}).then(() => {
+  Logger.debug('main.ts', 'Login initialization completed with EnvService initialized')
+}).catch((error) => {
+  Logger.error('main.ts', `Login initialization failed: ${error}`)
 })

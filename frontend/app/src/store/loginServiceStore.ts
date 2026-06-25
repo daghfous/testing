@@ -3,11 +3,15 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
-import { usersClient } from '@ateme/login-service/src/config/api'
+import { getUsersClient } from '@ateme/login-service/src/config/api'
 import { IRoleAction, IUnknownObjectKeys, IUser } from '@ateme/login-service/src/interfaces/Interfaces.ts'
 import AuthStorageService from '@ateme/login-service/src/services/AuthStorageService'
 import CurrentUserService from '@ateme/login-service/src/services/CurrentUserService'
 import tokenService from '@ateme/login-service/src/services/TokenService'
+import EnvService from '@ateme/cathodic-ui/src/services/EnvService'
+
+// Get usersClient instance (lazy initialized)
+const usersClient = getUsersClient()
 
 /**
  * Process in case of unauthorized request.
@@ -25,6 +29,11 @@ const unauthorizedProcess = async (resp: AxiosResponse | AxiosError) => {
  * @returns {object} - User Store
  */
 export const loginServiceStore = defineStore('loginServiceStore', () => {
+  // Ensure EnvService is initialized before store is used
+  EnvService.getInstance().initConfigMap().catch((error) => {
+    console.warn('Failed to initialize EnvService in loginServiceStore:', error)
+  })
+
   const { notifySuccess, notifyError } = notificationStore()
 
   // #####################################
